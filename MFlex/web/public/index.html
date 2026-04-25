@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>💖 Для тебя</title>
+  <meta name="description" content="Специальное послание для самого особенного человека">
+  <meta name="theme-color" content="#06000f">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💖</text></svg>">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Visual layers -->
+  <canvas id="particles"></canvas>
+  <div class="vignette"></div>
+  <div class="noise"></div>
+
+  <!-- Ambient glow orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Cursor sparkle trail -->
+  <div id="sparkle-container"></div>
+
+  <!-- Music toggle -->
+  <button id="music-btn" class="music-btn" aria-label="Музыка">
+    <span class="music-icon" id="music-icon">🎵</span>
+    <div class="music-rings"><span></span><span></span><span></span></div>
+  </button>
+
+  <!-- Progress dots -->
+  <div class="progress-dots" id="progress">
+    <span class="dot active"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+  </div>
+
+  <!-- Hidden YouTube player -->
+  <div id="yt-wrap" style="position:fixed;top:-9999px;left:-9999px;pointer-events:none;">
+    <div id="yt-player"></div>
+  </div>
+
+  <!-- ════════════════════════════════════════ -->
+  <!--  SCREENS                                -->
+  <!-- ════════════════════════════════════════ -->
+  <main id="app" class="app">
+
+    <!-- Welcome -->
+    <section id="screen-welcome" class="screen active">
+      <div class="card glass glow-border">
+        <div class="floating-emoji">💫</div>
+        <h1 class="title-main">У&nbsp;меня есть кое&#8209;что<br>для тебя&hellip;</h1>
+        <p class="subtitle">Но сначала — маленькая игра</p>
+        <button class="btn btn-primary" id="btn-start">
+          <span>Начать</span>
+          <span class="btn-heart">💖</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Question 1 -->
+    <section id="screen-q1" class="screen">
+      <div class="card glass glow-border">
+        <div class="question-badge">1 / 2</div>
+        <h2 class="title-question">Где мы чаще всего<br>переписываемся? 😊</h2>
+        <div class="options" id="q1-options"></div>
+        <p id="q1-hint" class="hint">Не совсем 😄 Попробуй ещё</p>
+      </div>
+    </section>
+
+    <!-- Question 2 -->
+    <section id="screen-q2" class="screen">
+      <div class="card glass glow-border">
+        <div class="question-badge">2 / 2</div>
+        <h2 class="title-question">А где всё началось? 💭</h2>
+        <div class="options" id="q2-options"></div>
+        <p id="q2-hint" class="hint">Подумай ещё чуть-чуть 💭</p>
+      </div>
+    </section>
+
+    <!-- Transition -->
+    <section id="screen-transition" class="screen">
+      <div class="transition-content">
+        <span class="transition-star">✨</span>
+        <p class="transition-text">Ты помнишь всё правильно…</p>
+      </div>
+    </section>
+
+    <!-- Emotional -->
+    <section id="screen-emotional" class="screen">
+      <div class="story-container">
+        <div id="emotional-messages" class="messages-flow"></div>
+        <button id="btn-continue" class="btn btn-primary btn-continue is-hidden">
+          <span>Дальше</span><span class="btn-arrow">➡️</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Finale -->
+    <section id="screen-finale" class="screen">
+      <div class="story-container">
+        <div id="finale-messages" class="messages-flow"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script src="script.js"></script>
+</body>
+</html>
