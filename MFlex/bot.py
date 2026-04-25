@@ -109,7 +109,7 @@ async def handle_message(message: types.Message):
                 "Ты помнишь…\n\n"
                 "А теперь скажи — где всё началось? 💭",
                 # ⬇️ Замени варианты под себя
-                reply_markup=make_keyboard(["В школе", "Во дворе", "В интернете", "На вечеринке"]),
+                reply_markup=make_keyboard(["В университете", "Во дворе", "В интернете", "На вечеринке"]),
             )
         else:
             await message.answer(
