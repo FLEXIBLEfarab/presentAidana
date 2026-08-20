@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Search, Sparkles, MapPin, User, Map } from "lucide-react";
+import { Search, Sparkles, MapPin, User } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { LanguageToggle } from "@/components/ui/language-toggle";
 import { useI18n } from "@/lib/i18n/context";
@@ -55,15 +55,6 @@ export function Header() {
 
         {/* Right Controls */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Map view toggle */}
-          <Link
-            href="/map"
-            className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-sand-300 bg-white px-3.5 py-1.5 text-xs font-bold text-stone-700 hover:border-emerald-800 transition-all shadow-sm"
-          >
-            <Map className="h-3.5 w-3.5 text-emerald-700" />
-            <span>На карте</span>
-          </Link>
-
           {/* Language Toggle */}
           <LanguageToggle />
 
