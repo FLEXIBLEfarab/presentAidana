@@ -94,41 +94,10 @@ export function BookingSummary({
           <span className="font-semibold text-stone-800">{formatKZT(priceInfo.baseTotal)}</span>
         </div>
 
-        {priceInfo.weekendSurgeTotal > 0 && (
-          <div className="flex justify-between text-amber-700">
-            <span>Наценка выходного дня</span>
-            <span>+{formatKZT(priceInfo.weekendSurgeTotal)}</span>
-          </div>
-        )}
-
-        {priceInfo.discountTotal > 0 && (
-          <div className="flex justify-between text-emerald-700 font-semibold">
-            <span className="flex items-center gap-1">
-              <TrendingDown className="h-3 w-3" />
-              Скидка за длительность ({priceInfo.discountPercent}%)
-            </span>
-            <span>−{formatKZT(priceInfo.discountTotal)}</span>
-          </div>
-        )}
-
-        <div className="flex justify-between">
-          <span>Уборка и смена белья</span>
-          <span className="font-semibold text-stone-800">{formatKZT(priceInfo.cleaningFee)}</span>
-        </div>
-
-        <div className="flex justify-between">
-          <span>Сервисный сбор</span>
-          <span className="font-semibold text-stone-800">{formatKZT(priceInfo.serviceFee)}</span>
-        </div>
-
         <div className="flex items-center justify-between border-t border-sand-200 pt-3 text-sm font-bold text-emerald-950">
           <span>Итого (KZT)</span>
           <span className="text-lg font-extrabold">{formatKZT(priceInfo.total)}</span>
         </div>
-
-        <p className="text-[11px] text-stone-400">
-          Депозит {formatKZT(priceInfo.depositAmount)} возвращается при выезде
-        </p>
       </div>
 
       {/* Guarantee Badge */}

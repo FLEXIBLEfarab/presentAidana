@@ -41,12 +41,6 @@ export function BookingClient({ apartment, checkIn, checkOut, guests }: BookingC
     baseNightPrice: apartment.base_night_price,
     checkIn,
     checkOut,
-    weekendSurgeEnabled: apartment.weekend_surge_enabled,
-    weekendSurgePercent: apartment.weekend_surge_percent || 15,
-    cleaningFee: 3500,
-    serviceFeePercent: 5,
-    longStayDiscountEnabled: apartment.long_stay_discounts_enabled,
-    depositAmount: apartment.deposit_default || 15000,
   });
 
   const validate = () => {

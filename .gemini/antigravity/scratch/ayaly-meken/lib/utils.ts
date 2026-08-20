@@ -37,12 +37,6 @@ export function calculateBookingPrice({
   baseNightPrice,
   checkIn,
   checkOut,
-  weekendSurgePercent = 15,
-  weekendSurgeEnabled = false,
-  cleaningFee = 3500,
-  serviceFeePercent = 5,
-  longStayDiscountEnabled = true,
-  depositAmount = 15000,
 }: {
   baseNightPrice: number;
   checkIn?: string | Date;
@@ -60,12 +54,12 @@ export function calculateBookingPrice({
       basePrice: baseNightPrice,
       baseTotal: baseNightPrice,
       weekendSurgeTotal: 0,
-      cleaningFee,
-      serviceFee: Math.round(baseNightPrice * (serviceFeePercent / 100)),
+      cleaningFee: 0,
+      serviceFee: 0,
       discountTotal: 0,
-      depositAmount,
+      depositAmount: 0,
       discountPercent: 0,
-      total: baseNightPrice + cleaningFee + Math.round(baseNightPrice * (serviceFeePercent / 100)),
+      total: baseNightPrice,
     };
   }
 
@@ -73,45 +67,18 @@ export function calculateBookingPrice({
   const outDate = typeof checkOut === "string" ? parseISO(checkOut) : checkOut;
 
   const diffDays = Math.max(1, differenceInDays(outDate, inDate));
-  let nightsTotal = 0;
-  let surgeTotal = 0;
-
-  for (let i = 0; i < diffDays; i++) {
-    const currentDate = new Date(inDate);
-    currentDate.setDate(currentDate.getDate() + i);
-
-    let currentNightPrice = baseNightPrice;
-    if (weekendSurgeEnabled && isWeekend(currentDate)) {
-      const extra = Math.round(baseNightPrice * (weekendSurgePercent / 100));
-      surgeTotal += extra;
-      currentNightPrice += extra;
-    }
-    nightsTotal += currentNightPrice;
-  }
-
-  // Long stay discounts: 3+ nights = 5%, 7+ nights = 10%, 28+ nights = 20%
-  let discountPercent = 0;
-  if (longStayDiscountEnabled) {
-    if (diffDays >= 28) discountPercent = 20;
-    else if (diffDays >= 7) discountPercent = 10;
-    else if (diffDays >= 3) discountPercent = 5;
-  }
-
-  const discountTotal = Math.round(nightsTotal * (discountPercent / 100));
-  const subTotalAfterDiscount = nightsTotal - discountTotal;
-  const serviceFee = Math.round(subTotalAfterDiscount * (serviceFeePercent / 100));
-  const finalTotal = subTotalAfterDiscount + cleaningFee + serviceFee;
+  const finalTotal = baseNightPrice * diffDays;
 
   return {
     nights: diffDays,
     basePrice: baseNightPrice,
-    baseTotal: nightsTotal,
-    weekendSurgeTotal: surgeTotal,
-    cleaningFee,
-    serviceFee,
-    discountTotal,
-    discountPercent,
-    depositAmount,
+    baseTotal: finalTotal,
+    weekendSurgeTotal: 0,
+    cleaningFee: 0,
+    serviceFee: 0,
+    discountTotal: 0,
+    discountPercent: 0,
+    depositAmount: 0,
     total: finalTotal,
   };
 }

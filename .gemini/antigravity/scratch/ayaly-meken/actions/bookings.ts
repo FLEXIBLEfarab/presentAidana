@@ -67,7 +67,7 @@ export async function createBooking(
     check_out_date: input.checkOutDate,
     total_price: input.totalPrice,
     platform_commission: 0,
-    deposit_amount: input.depositAmount || 15000,
+    deposit_amount: input.depositAmount || 0,
     deposit_status: "pending" as const,
     payment_method: input.paymentMethod,
     is_fiscalized: true,
