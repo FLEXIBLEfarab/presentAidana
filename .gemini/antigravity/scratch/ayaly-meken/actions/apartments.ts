@@ -5,36 +5,62 @@ import { MOCK_APARTMENTS } from "@/lib/mock-data";
 import { Apartment, SearchFilters, Result } from "@/types/database.types";
 import { applyFiltersAndSort } from "@/lib/search-filters";
 
+const ASTANA_HOTSPOTS = [
+  { lat: 51.1278, lng: 71.4682, name: "Highvill / Байтурсынова" },
+  { lat: 51.1283, lng: 71.4305, name: "Байтерек / бульвар Нуржол" },
+  { lat: 51.0886, lng: 71.4138, name: "Mega Silk Way / EXPO" },
+  { lat: 51.1092, lng: 71.4285, name: "Ботанический сад / Орынбор" },
+  { lat: 51.1325, lng: 71.4038, name: "ТРЦ Хан Шатыр / Туран" },
+  { lat: 51.1605, lng: 71.4280, name: "Набережная / Кенесары" },
+  { lat: 51.1395, lng: 71.4150, name: "Триумф Астаны" },
+  { lat: 51.1520, lng: 71.4170, name: "Городской парк / Сарыарка" },
+];
+
+const ALMATY_HOTSPOTS = [
+  { lat: 43.2325, lng: 76.9560, name: "Достык плаза / Самал" },
+  { lat: 43.2610, lng: 76.9420, name: "Арбат / Панфилова" },
+  { lat: 43.2185, lng: 76.9280, name: "Esentai Mall / Аль-Фараби" },
+  { lat: 43.2030, lng: 76.8920, name: "Mega Alma-Ata / Розыбакиева" },
+  { lat: 43.2240, lng: 76.9080, name: "Атакент / Тимирязева" },
+  { lat: 43.2490, lng: 76.9480, name: "Золотой квадрат / Кабанбай" },
+];
+
+const SHYMKENT_HOTSPOTS = [
+  { lat: 42.3180, lng: 69.5890, name: "Shymkent Plaza / Аль-Фараби" },
+  { lat: 42.3710, lng: 69.6150, name: "мкр. Нурсат / Акимат" },
+  { lat: 42.3550, lng: 69.6020, name: "Байдибек Би / Дендропарк" },
+  { lat: 42.3120, lng: 69.5950, name: "Центральный парк / Казыбек Би" },
+];
+
 function getCoordinatesForApartment(apt: any): { lat: number; lng: number } {
   if (apt.lat && apt.lng) return { lat: Number(apt.lat), lng: Number(apt.lng) };
 
   const city = (apt.city || "").toLowerCase();
-  let baseLat = 51.128;
-  let baseLng = 71.430; // Astana default
+  const address = (apt.address || "").toLowerCase();
+  const name = (apt.name || "").toLowerCase();
 
+  let pool = ASTANA_HOTSPOTS;
   if (city.includes("алмат") || city.includes("almat")) {
-    baseLat = 43.238;
-    baseLng = 76.945; // Almaty
+    pool = ALMATY_HOTSPOTS;
   } else if (city.includes("шымкент") || city.includes("shymk")) {
-    baseLat = 42.315;
-    baseLng = 69.587; // Shymkent
-  } else if (city.includes("астан") || city.includes("astan") || city.includes("нур-султан")) {
-    baseLat = 51.128;
-    baseLng = 71.430; // Astana
+    pool = SHYMKENT_HOTSPOTS;
   }
 
-  const idStr = String(apt.id || "1");
+  const key = `${apt.id}-${name}-${address}`;
   let hash = 0;
-  for (let i = 0; i < idStr.length; i++) {
-    hash = (hash << 5) - hash + idStr.charCodeAt(i);
+  for (let i = 0; i < key.length; i++) {
+    hash = (hash << 5) - hash + key.charCodeAt(i);
     hash |= 0;
   }
-  const offsetLat = ((Math.abs(hash) % 100) - 50) * 0.0004;
-  const offsetLng = ((Math.abs(hash >> 3) % 100) - 50) * 0.0004;
+  const index = Math.abs(hash) % pool.length;
+  const hotspot = pool[index];
+
+  const subOffsetLat = ((Math.abs(hash >> 2) % 20) - 10) * 0.0003;
+  const subOffsetLng = ((Math.abs(hash >> 5) % 20) - 10) * 0.0003;
 
   return {
-    lat: Number((baseLat + offsetLat).toFixed(6)),
-    lng: Number((baseLng + offsetLng).toFixed(6)),
+    lat: Number((hotspot.lat + subOffsetLat).toFixed(6)),
+    lng: Number((hotspot.lng + subOffsetLng).toFixed(6)),
   };
 }
 
