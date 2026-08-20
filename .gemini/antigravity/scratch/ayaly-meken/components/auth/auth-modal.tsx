@@ -103,9 +103,8 @@ export function AuthModal() {
 
         {/* Brand Header */}
         <div className="text-center pb-5">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-950 text-cream-50 shadow-lg shadow-emerald-950/30 mb-3 border border-amber-400/30">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/favicon.svg" alt="Logo" className="w-10 h-10 object-contain" />
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-600 to-emerald-900 text-white font-sans font-black text-xl tracking-tight shadow-lg shadow-emerald-950/30 mb-3 border border-emerald-500/30">
+            AM
           </div>
           <h2 className="font-serif text-2xl font-bold text-emerald-950">
             {step === "otp"
