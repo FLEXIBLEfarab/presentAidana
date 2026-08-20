@@ -3,6 +3,8 @@ export interface GuestUser {
   name: string;
   phone: string;
   email?: string;
+  city?: string;
+  avatar_url?: string;
   created_at: string;
 }
 

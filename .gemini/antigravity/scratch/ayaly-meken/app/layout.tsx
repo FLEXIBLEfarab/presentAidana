@@ -7,6 +7,7 @@ import { Footer } from "@/components/layout/footer";
 import { I18nProvider } from "@/lib/i18n/context";
 import { AuthProvider } from "@/lib/auth-context";
 import { AuthModal } from "@/components/auth/auth-modal";
+import { ProfileModal } from "@/components/profile/profile-modal";
 
 const jakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -69,6 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Footer />
             <MobileNav />
             <AuthModal />
+            <ProfileModal />
           </I18nProvider>
         </AuthProvider>
       </body>

@@ -13,7 +13,7 @@ export function Header() {
   const pathname = usePathname();
   const isHome = pathname === "/";
   const { t } = useI18n();
-  const { user, openAuthModal } = useGuestAuth();
+  const { user, openAuthModal, openProfileModal } = useGuestAuth();
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-emerald-950/5 bg-cream-50/90 backdrop-blur-md transition-all">
@@ -59,7 +59,7 @@ export function Header() {
           {/* Map view toggle */}
           <Link
             href="/map"
-            className="hidden sm:flex items-center gap-1.5 rounded-full border border-sand-300 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700 hover:bg-sand-50 transition-colors shadow-sm"
+            className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-sand-300 bg-white px-3.5 py-1.5 text-xs font-bold text-stone-700 hover:border-emerald-800 transition-all shadow-sm"
           >
             <Map className="h-3.5 w-3.5 text-emerald-700" />
             <span>На карте</span>
@@ -81,14 +81,16 @@ export function Header() {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={openAuthModal}
-                className="flex items-center gap-2 rounded-full border border-sand-300 bg-white p-1.5 pr-3 shadow-sm hover:shadow-md transition-all text-left"
+                onClick={openProfileModal}
+                className="flex items-center gap-2 rounded-full border border-sand-300 bg-white p-1.5 pr-3 shadow-sm hover:shadow-md hover:border-emerald-600 transition-all text-left group"
               >
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-900 text-cream-50 font-bold text-xs">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-emerald-900 to-emerald-950 text-cream-50 font-bold text-xs shadow-xs group-hover:scale-105 transition-transform border border-amber-400/30">
                   {user.name ? user.name.slice(0, 1).toUpperCase() : "Г"}
                 </div>
                 <div className="hidden md:block leading-none">
-                  <span className="text-xs font-bold text-stone-800 block">{user.name.split(" ")[0]}</span>
+                  <span className="text-xs font-bold text-stone-800 block group-hover:text-emerald-900 transition-colors">
+                    {user.name.split(" ")[0]}
+                  </span>
                   <span className="text-[9px] text-stone-400 font-mono">{user.phone}</span>
                 </div>
               </button>

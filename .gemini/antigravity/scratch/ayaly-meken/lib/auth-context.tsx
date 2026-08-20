@@ -7,10 +7,14 @@ interface AuthContextType {
   user: GuestUser | null;
   isLoading: boolean;
   isAuthModalOpen: boolean;
+  isProfileModalOpen: boolean;
   openAuthModal: () => void;
   closeAuthModal: () => void;
+  openProfileModal: () => void;
+  closeProfileModal: () => void;
   login: (phone: string, name?: string, email?: string) => void;
-  register: (name: string, phone: string, email?: string) => void;
+  register: (name: string, phone: string, email?: string, city?: string) => void;
+  updateProfile: (data: Partial<GuestUser>) => void;
   logout: () => void;
 }
 
@@ -22,6 +26,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<GuestUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -35,6 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           name: "Азамат Касымов",
           phone: "+7 778 555 1234",
           email: "azamat@ayaly.kz",
+          city: "Астана",
           created_at: new Date().toISOString(),
         };
         setUser(defaultGuest);
@@ -54,6 +60,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       name: name || user?.name || "Гость",
       phone: cleanPhone,
       email: email || user?.email,
+      city: user?.city || "Астана",
       created_at: user?.created_at || new Date().toISOString(),
     };
     setUser(guestUser);
@@ -62,13 +69,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsAuthModalOpen(false);
   };
 
-  const register = (name: string, phone: string, email?: string) => {
+  const register = (name: string, phone: string, email?: string, city?: string) => {
     const cleanPhone = phone.trim();
     const guestUser: GuestUser = {
       id: `guest-${Date.now()}`,
       name: name.trim(),
       phone: cleanPhone,
       email: email?.trim(),
+      city: city?.trim() || "Астана",
       created_at: new Date().toISOString(),
     };
     setUser(guestUser);
@@ -77,10 +85,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsAuthModalOpen(false);
   };
 
+  const updateProfile = (data: Partial<GuestUser>) => {
+    if (!user) return;
+    const updated: GuestUser = {
+      ...user,
+      ...data,
+    };
+    setUser(updated);
+    localStorage.setItem(GUEST_STORAGE_KEY, JSON.stringify(updated));
+    if (updated.phone) {
+      document.cookie = `ayaly_guest_phone=${encodeURIComponent(updated.phone)}; path=/; max-age=2592000`;
+    }
+  };
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem(GUEST_STORAGE_KEY);
     document.cookie = "ayaly_guest_phone=; path=/; max-age=0";
+    setIsProfileModalOpen(false);
   };
 
   return (
@@ -89,10 +111,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         isLoading,
         isAuthModalOpen,
-        openAuthModal: () => setIsAuthModalOpen(true),
+        isProfileModalOpen,
+        openAuthModal: () => {
+          setIsProfileModalOpen(false);
+          setIsAuthModalOpen(true);
+        },
         closeAuthModal: () => setIsAuthModalOpen(false),
+        openProfileModal: () => {
+          setIsAuthModalOpen(false);
+          setIsProfileModalOpen(true);
+        },
+        closeProfileModal: () => setIsProfileModalOpen(false),
         login,
         register,
+        updateProfile,
         logout,
       }}
     >
