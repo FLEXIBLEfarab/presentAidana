@@ -30,6 +30,15 @@ export const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: "rating_desc", label: "По рейтингу" },
 ];
 
+export function normalizeCity(c?: string | null): string {
+  if (!c) return "";
+  const s = c.toLowerCase().trim();
+  if (s.includes("almat") || s.includes("алмат")) return "almaty";
+  if (s.includes("astan") || s.includes("астан") || s.includes("нур-султан")) return "astana";
+  if (s.includes("shymk") || s.includes("шымк")) return "shymkent";
+  return s;
+}
+
 export function applyFiltersAndSort(
   apartments: Apartment[],
   filters: SearchFilters
@@ -37,10 +46,13 @@ export function applyFiltersAndSort(
   let result = [...apartments];
 
   // City filter
-  if (filters.city && filters.city !== "All") {
-    result = result.filter(
-      (a) => a.city?.toLowerCase() === filters.city!.toLowerCase()
-    );
+  if (filters.city && filters.city !== "All" && filters.city !== "Все") {
+    const targetCity = normalizeCity(filters.city);
+    result = result.filter((a) => {
+      const aptCity = normalizeCity(a.city);
+      const aptAddress = normalizeCity(a.address);
+      return aptCity === targetCity || aptAddress.includes(targetCity);
+    });
   }
 
   // Text search

@@ -3,6 +3,7 @@ import { ApartmentCard } from "@/components/apartments/apartment-card";
 import { SearchBar } from "@/components/search/search-bar";
 import { CategoryTabs } from "@/components/search/category-tabs";
 import { SearchFilters } from "@/types/database.types";
+import { normalizeCity } from "@/lib/search-filters";
 import { Sparkles, MapPin, ArrowRight, Map, ShieldCheck, Key, Wifi, Clock } from "lucide-react";
 import Link from "next/link";
 
@@ -75,7 +76,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               { val: "Astana", label: "📍 Астана" },
               { val: "Shymkent", label: "📍 Шымкент" },
             ].map(({ val, label }) => {
-              const isActive = (val === "All" && (!cityFilter || cityFilter === "All")) || cityFilter === val;
+              const isActive =
+                (val === "All" && (!cityFilter || cityFilter === "All")) ||
+                normalizeCity(cityFilter) === normalizeCity(val);
               return (
                 <Link
                   key={val}
