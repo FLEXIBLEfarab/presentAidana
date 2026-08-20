@@ -23,29 +23,7 @@ L.Icon.Default.mergeOptions({
 function createPriceIcon(price: number, isActive: boolean): L.DivIcon {
   const thousandKZT = Math.round(price / 1000);
   return L.divIcon({
-    html: `
-      <div style="
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: ${isActive ? "#022c22" : "#064e3b"};
-        color: #ffffff;
-        border: 2px solid ${isActive ? "#fbbf24" : "#ffffff"};
-        border-radius: 9999px;
-        padding: 5px 11px;
-        font-weight: 800;
-        font-size: 12px;
-        line-height: 1;
-        white-space: nowrap;
-        box-shadow: 0 4px 14px rgba(0,0,0,0.3);
-        transform: translate(-50%, -50%) ${isActive ? "scale(1.15)" : "scale(1)"};
-        cursor: pointer;
-        transition: transform 0.15s ease-in-out;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      ">
-        <span>${thousandKZT}&nbsp;тыс&nbsp;₸</span>
-      </div>
-    `,
+    html: `<div class="custom-map-badge ${isActive ? "active" : ""}">${thousandKZT}&nbsp;тыс&nbsp;₸</div>`,
     className: "leaflet-price-pin",
     iconSize: [0, 0],
     iconAnchor: [0, 0],
