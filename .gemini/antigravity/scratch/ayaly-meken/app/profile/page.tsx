@@ -18,16 +18,24 @@ import {
   MessageCircle,
   Clock,
   Heart,
+  Ticket,
+  Coins,
+  ArrowRight,
+  Tag,
 } from "lucide-react";
 import { useGuestAuth } from "@/lib/auth-context";
+import { formatKZT } from "@/lib/utils";
 
 export default function ProfilePage() {
-  const { user, updateProfile, logout, deleteAccount, openAuthModal } = useGuestAuth();
+  const { user, updateProfile, applyPromoCode, logout, deleteAccount, openAuthModal } = useGuestAuth();
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [city, setCity] = useState("Астана");
+  const [promoInput, setPromoInput] = useState("");
+  const [promoMessage, setPromoMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [isApplyingPromo, setIsApplyingPromo] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
@@ -39,6 +47,7 @@ export default function ProfilePage() {
       setEmail(user.email || "");
       setCity(user.city || "Астана");
       setIsDeleteConfirmOpen(false);
+      setPromoMessage(null);
     }
   }, [user]);
 
@@ -79,6 +88,29 @@ export default function ProfilePage() {
       setIsSaving(false);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 2500);
+    }, 400);
+  };
+
+  const handleApplyPromo = (e?: React.FormEvent, customCode?: string) => {
+    if (e) e.preventDefault();
+    const codeToUse = customCode || promoInput;
+    if (!codeToUse.trim()) {
+      setPromoMessage({ type: "error", text: "Введите код промокода" });
+      return;
+    }
+
+    setIsApplyingPromo(true);
+    setPromoMessage(null);
+
+    setTimeout(() => {
+      const res = applyPromoCode(codeToUse);
+      setIsApplyingPromo(false);
+      if (res.success) {
+        setPromoMessage({ type: "success", text: res.message });
+        setPromoInput("");
+      } else {
+        setPromoMessage({ type: "error", text: res.message });
+      }
     }, 400);
   };
 
@@ -124,9 +156,15 @@ export default function ProfilePage() {
                 </>
               )}
             </p>
-            <span className="inline-flex items-center gap-1 mt-2 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 text-[10px] font-bold border border-emerald-300">
-              💎 Премиум гость • Аялы Мекен
-            </span>
+            <div className="flex items-center gap-2 mt-2 flex-wrap">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 text-[10px] font-bold border border-emerald-300">
+                💎 Премиум гость • Аялы Мекен
+              </span>
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[10px] font-extrabold border border-amber-300">
+                <Coins size={12} className="text-amber-600" />
+                {formatKZT(user.bonus_balance || 5000)}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -159,6 +197,98 @@ export default function ProfilePage() {
               <span className="text-xs text-stone-400">WhatsApp поддержка 24/7</span>
             </div>
           </Link>
+        </div>
+
+        {/* PROMOCODE SECTION */}
+        <div className="p-5 rounded-2xl bg-sand-50/80 border border-sand-200/80 space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xs font-bold text-emerald-950 uppercase tracking-wider flex items-center gap-1.5">
+              <Ticket size={14} className="text-amber-500" />
+              Промокоды и бонусы
+            </h2>
+            <span className="text-xs font-bold text-emerald-800">
+              Баланс бонусов: {formatKZT(user.bonus_balance || 5000)}
+            </span>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleApplyPromo} className="flex gap-2">
+            <div className="relative flex-1">
+              <Tag size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
+              <input
+                type="text"
+                value={promoInput}
+                onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
+                placeholder="Введите промокод (напр. AYALY)"
+                className="w-full h-11 rounded-xl border border-sand-300 bg-white pl-9 pr-3 text-xs font-bold uppercase tracking-wider text-emerald-950 placeholder:normal-case placeholder:font-normal placeholder:tracking-normal focus:border-emerald-700 focus:outline-none transition-all"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={isApplyingPromo || !promoInput.trim()}
+              className="h-11 px-5 rounded-xl bg-emerald-900 hover:bg-emerald-800 disabled:opacity-50 text-cream-50 text-xs font-bold shadow-sm flex items-center gap-1.5 transition-all cursor-pointer"
+            >
+              {isApplyingPromo ? (
+                <Loader2 className="w-4 h-4 animate-spin text-amber-300" />
+              ) : (
+                <>
+                  <span>Активировать</span>
+                  <ArrowRight size={14} className="text-amber-300" />
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Feedback */}
+          {promoMessage && (
+            <div
+              className={`p-3 rounded-xl text-xs font-semibold flex items-center gap-2 animate-in fade-in ${
+                promoMessage.type === "success"
+                  ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                  : "bg-red-50 text-red-700 border border-red-200"
+              }`}
+            >
+              {promoMessage.type === "success" ? (
+                <Check size={15} className="text-emerald-600 shrink-0" />
+              ) : (
+                <span>⚠️</span>
+              )}
+              <span>{promoMessage.text}</span>
+            </div>
+          )}
+
+          {/* Promo code pills */}
+          <div>
+            <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-1.5">
+              Доступные промокоды для активации:
+            </span>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { code: "AYALY", desc: "+3 000 ₸" },
+                { code: "WELCOME", desc: "+5 000 ₸" },
+                { code: "VIPGUEST", desc: "+10 000 ₸" },
+              ].map(({ code, desc }) => {
+                const isActivated = user.promocodes?.includes(code);
+                return (
+                  <button
+                    key={code}
+                    type="button"
+                    disabled={isActivated}
+                    onClick={() => handleApplyPromo(undefined, code)}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                      isActivated
+                        ? "bg-emerald-100 text-emerald-800 border border-emerald-300 opacity-80 cursor-default"
+                        : "bg-white hover:bg-amber-100 text-stone-700 hover:text-amber-900 border border-sand-300 cursor-pointer shadow-2xs"
+                    }`}
+                  >
+                    <span>🎟️ {code}</span>
+                    <span className="text-stone-400">({desc})</span>
+                    {isActivated && <Check size={12} className="text-emerald-600 ml-0.5" />}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
 
         {/* Edit Profile Form */}

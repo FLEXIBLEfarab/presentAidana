@@ -20,17 +20,34 @@ import {
   FileText,
   Clock,
   Heart,
+  Ticket,
+  Gift,
+  Coins,
+  ArrowRight,
+  Tag,
 } from "lucide-react";
 import { useGuestAuth } from "@/lib/auth-context";
+import { formatKZT } from "@/lib/utils";
 
 export function ProfileModal() {
-  const { user, isProfileModalOpen, closeProfileModal, updateProfile, logout, deleteAccount, openAuthModal } =
-    useGuestAuth();
+  const {
+    user,
+    isProfileModalOpen,
+    closeProfileModal,
+    updateProfile,
+    applyPromoCode,
+    logout,
+    deleteAccount,
+    openAuthModal,
+  } = useGuestAuth();
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [city, setCity] = useState("Астана");
+  const [promoInput, setPromoInput] = useState("");
+  const [promoMessage, setPromoMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [isApplyingPromo, setIsApplyingPromo] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
@@ -43,6 +60,7 @@ export function ProfileModal() {
       setCity(user.city || "Астана");
       setSaveSuccess(false);
       setIsDeleteConfirmOpen(false);
+      setPromoMessage(null);
     }
   }, [user, isProfileModalOpen]);
 
@@ -69,7 +87,7 @@ export function ProfileModal() {
           <button
             type="button"
             onClick={openAuthModal}
-            className="w-full h-11 rounded-2xl bg-emerald-900 hover:bg-emerald-800 text-cream-50 text-xs font-bold shadow-md"
+            className="w-full h-11 rounded-2xl bg-emerald-900 hover:bg-emerald-800 text-cream-50 text-xs font-bold shadow-md cursor-pointer"
           >
             Войти / Регистрация
           </button>
@@ -92,6 +110,29 @@ export function ProfileModal() {
       setIsSaving(false);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 2500);
+    }, 400);
+  };
+
+  const handleApplyPromo = (e?: React.FormEvent, customCode?: string) => {
+    if (e) e.preventDefault();
+    const codeToUse = customCode || promoInput;
+    if (!codeToUse.trim()) {
+      setPromoMessage({ type: "error", text: "Введите код промокода" });
+      return;
+    }
+
+    setIsApplyingPromo(true);
+    setPromoMessage(null);
+
+    setTimeout(() => {
+      const res = applyPromoCode(codeToUse);
+      setIsApplyingPromo(false);
+      if (res.success) {
+        setPromoMessage({ type: "success", text: res.message });
+        setPromoInput("");
+      } else {
+        setPromoMessage({ type: "error", text: res.message });
+      }
     }, 400);
   };
 
@@ -145,14 +186,20 @@ export function ProfileModal() {
                 </>
               )}
             </p>
-            <span className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 text-[10px] font-bold border border-emerald-300">
-              💎 Премиум гость • Аялы Мекен
-            </span>
+            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 text-[10px] font-bold border border-emerald-300">
+                💎 Премиум гость • Аялы Мекен
+              </span>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[10px] font-extrabold border border-amber-300">
+                <Coins size={11} className="text-amber-600" />
+                {formatKZT(user.bonus_balance || 5000)}
+              </span>
+            </div>
           </div>
         </div>
 
         {/* Quick Navigation Cards */}
-        <div className="grid grid-cols-2 gap-2.5 py-5 border-b border-sand-200">
+        <div className="grid grid-cols-2 gap-2.5 py-4 border-b border-sand-200">
           <Link
             href="/bookings"
             onClick={closeProfileModal}
@@ -183,8 +230,100 @@ export function ProfileModal() {
           </Link>
         </div>
 
+        {/* PROMOCODE SECTION */}
+        <div className="py-4 border-b border-sand-200">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-xs font-bold text-emerald-950 uppercase tracking-wider flex items-center gap-1.5">
+              <Ticket size={13} className="text-amber-500" />
+              Промокоды и бонусы
+            </h3>
+            <span className="text-[11px] font-bold text-emerald-800">
+              Баланс: {formatKZT(user.bonus_balance || 5000)}
+            </span>
+          </div>
+
+          {/* Promo code form */}
+          <form onSubmit={handleApplyPromo} className="flex gap-2">
+            <div className="relative flex-1">
+              <Tag size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
+              <input
+                type="text"
+                value={promoInput}
+                onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
+                placeholder="Введите промокод (напр. AYALY)"
+                className="w-full h-10 rounded-xl border border-sand-300 bg-sand-50/50 pl-8 pr-3 text-xs font-bold uppercase tracking-wider text-emerald-950 placeholder:normal-case placeholder:font-normal placeholder:tracking-normal focus:bg-white focus:border-emerald-700 focus:outline-none transition-all"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={isApplyingPromo || !promoInput.trim()}
+              className="h-10 px-4 rounded-xl bg-emerald-900 hover:bg-emerald-800 disabled:opacity-50 text-cream-50 text-xs font-bold shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
+            >
+              {isApplyingPromo ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-300" />
+              ) : (
+                <>
+                  <span>Применить</span>
+                  <ArrowRight size={13} className="text-amber-300" />
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Promo feedback message */}
+          {promoMessage && (
+            <div
+              className={`mt-2.5 p-2.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 animate-in fade-in ${
+                promoMessage.type === "success"
+                  ? "bg-emerald-50 text-emerald-800 border border-emerald-200"
+                  : "bg-red-50 text-red-700 border border-red-200"
+              }`}
+            >
+              {promoMessage.type === "success" ? (
+                <Check size={14} className="text-emerald-600 shrink-0" />
+              ) : (
+                <span>⚠️</span>
+              )}
+              <span>{promoMessage.text}</span>
+            </div>
+          )}
+
+          {/* Quick clickable promo suggestions */}
+          <div className="mt-3">
+            <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-1.5">
+              Доступные промокоды:
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {[
+                { code: "AYALY", desc: "+3 000 ₸" },
+                { code: "WELCOME", desc: "+5 000 ₸" },
+                { code: "VIPGUEST", desc: "+10 000 ₸" },
+              ].map(({ code, desc }) => {
+                const isActivated = user.promocodes?.includes(code);
+                return (
+                  <button
+                    key={code}
+                    type="button"
+                    disabled={isActivated}
+                    onClick={() => handleApplyPromo(undefined, code)}
+                    className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${
+                      isActivated
+                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200 opacity-80 cursor-default"
+                        : "bg-sand-100 hover:bg-amber-100 text-stone-700 hover:text-amber-900 border border-sand-300 cursor-pointer"
+                    }`}
+                  >
+                    <span>🎟️ {code}</span>
+                    <span className="text-stone-400">({desc})</span>
+                    {isActivated && <Check size={10} className="text-emerald-600 ml-0.5" />}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
         {/* Edit Profile Form */}
-        <form onSubmit={handleSave} className="space-y-4 pt-5">
+        <form onSubmit={handleSave} className="space-y-4 pt-4">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold text-emerald-950 uppercase tracking-wider">
               Личные данные гостя

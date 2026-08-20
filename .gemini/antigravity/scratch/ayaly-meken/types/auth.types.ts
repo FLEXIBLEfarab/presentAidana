@@ -5,6 +5,8 @@ export interface GuestUser {
   email?: string;
   city?: string;
   avatar_url?: string;
+  promocodes?: string[];
+  bonus_balance?: number;
   created_at: string;
 }
 
