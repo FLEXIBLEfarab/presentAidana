@@ -24,7 +24,7 @@ import {
 import { useGuestAuth } from "@/lib/auth-context";
 
 export function ProfileModal() {
-  const { user, isProfileModalOpen, closeProfileModal, updateProfile, logout, openAuthModal } =
+  const { user, isProfileModalOpen, closeProfileModal, updateProfile, logout, deleteAccount, openAuthModal } =
     useGuestAuth();
 
   const [name, setName] = useState("");
@@ -33,6 +33,7 @@ export function ProfileModal() {
   const [city, setCity] = useState("Астана");
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -41,6 +42,7 @@ export function ProfileModal() {
       setEmail(user.email || "");
       setCity(user.city || "Астана");
       setSaveSuccess(false);
+      setIsDeleteConfirmOpen(false);
     }
   }, [user, isProfileModalOpen]);
 
@@ -91,6 +93,10 @@ export function ProfileModal() {
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 2500);
     }, 400);
+  };
+
+  const handleDeleteAccount = () => {
+    deleteAccount();
   };
 
   const getInitials = (fullName: string) => {
@@ -273,22 +279,54 @@ export function ProfileModal() {
           </button>
         </form>
 
-        {/* Log Out Button */}
-        <div className="pt-5 mt-5 border-t border-sand-200 flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-[11px] text-stone-400">
-            <ShieldCheck size={13} className="text-emerald-700" />
-            <span>Сессия активна</span>
+        {/* Confirmation card for delete account */}
+        {isDeleteConfirmOpen ? (
+          <div className="pt-4 mt-4 border-t border-red-200 p-4 rounded-2xl bg-red-50/90 border space-y-3 animate-in fade-in">
+            <div className="flex items-center gap-2 text-red-900 font-bold text-xs">
+              <span>⚠️</span>
+              <span>Вы уверены, что хотите удалить аккаунт?</span>
+            </div>
+            <p className="text-[11px] text-red-700 leading-snug">
+              Все сохраненные данные профиля и активная сессия будут удалены с этого устройства.
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setIsDeleteConfirmOpen(false)}
+                className="flex-1 py-2 rounded-xl bg-white border border-stone-300 text-xs font-bold text-stone-700 hover:bg-stone-50 transition-all"
+              >
+                Отмена
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteAccount}
+                className="flex-1 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-sm transition-all"
+              >
+                Да, удалить аккаунт
+              </button>
+            </div>
           </div>
+        ) : (
+          /* Account Actions: Logout & Delete */
+          <div className="pt-5 mt-5 border-t border-sand-200 flex items-center justify-between">
+            <button
+              type="button"
+              onClick={logout}
+              className="px-3 py-1.5 rounded-xl border border-sand-300 text-stone-600 hover:bg-sand-100 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+            >
+              <LogOut size={13} />
+              <span>Выйти</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={logout}
-            className="px-3 py-1.5 rounded-xl border border-red-200 text-red-600 hover:bg-red-50 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
-          >
-            <LogOut size={13} />
-            <span>Выйти из аккаунта</span>
-          </button>
-        </div>
+            <button
+              type="button"
+              onClick={() => setIsDeleteConfirmOpen(true)}
+              className="px-3 py-1.5 rounded-xl text-red-600 hover:bg-red-50 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+            >
+              <span>Удалить аккаунт</span>
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

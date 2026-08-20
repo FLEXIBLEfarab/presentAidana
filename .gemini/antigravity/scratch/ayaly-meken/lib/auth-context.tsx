@@ -16,6 +16,7 @@ interface AuthContextType {
   register: (name: string, phone: string, email?: string, city?: string) => void;
   updateProfile: (data: Partial<GuestUser>) => void;
   logout: () => void;
+  deleteAccount: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -105,6 +106,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsProfileModalOpen(false);
   };
 
+  const deleteAccount = () => {
+    setUser(null);
+    localStorage.removeItem(GUEST_STORAGE_KEY);
+    document.cookie = "ayaly_guest_phone=; path=/; max-age=0";
+    setIsProfileModalOpen(false);
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -126,6 +134,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         register,
         updateProfile,
         logout,
+        deleteAccount,
       }}
     >
       {children}

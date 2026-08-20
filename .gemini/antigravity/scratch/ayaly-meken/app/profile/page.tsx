@@ -22,7 +22,7 @@ import {
 import { useGuestAuth } from "@/lib/auth-context";
 
 export default function ProfilePage() {
-  const { user, updateProfile, logout, openAuthModal } = useGuestAuth();
+  const { user, updateProfile, logout, deleteAccount, openAuthModal } = useGuestAuth();
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -30,6 +30,7 @@ export default function ProfilePage() {
   const [city, setCity] = useState("Астана");
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -37,6 +38,7 @@ export default function ProfilePage() {
       setPhone(user.phone || "");
       setEmail(user.email || "");
       setCity(user.city || "Астана");
+      setIsDeleteConfirmOpen(false);
     }
   }, [user]);
 
@@ -251,22 +253,54 @@ export default function ProfilePage() {
           </button>
         </form>
 
-        {/* Log Out */}
-        <div className="pt-6 border-t border-sand-200 flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs text-stone-400">
-            <ShieldCheck size={14} className="text-emerald-700" />
-            <span>Сессия сохранена на этом устройстве</span>
+        {/* Confirmation card for delete account */}
+        {isDeleteConfirmOpen ? (
+          <div className="pt-4 border-t border-red-200 p-4 rounded-2xl bg-red-50/90 border space-y-3 animate-in fade-in">
+            <div className="flex items-center gap-2 text-red-900 font-bold text-xs">
+              <span>⚠️</span>
+              <span>Вы уверены, что хотите удалить аккаунт?</span>
+            </div>
+            <p className="text-xs text-red-700 leading-snug">
+              Все сохраненные данные вашего профиля и активная сессия будут безвозвратно удалены.
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setIsDeleteConfirmOpen(false)}
+                className="flex-1 py-2.5 rounded-xl bg-white border border-stone-300 text-xs font-bold text-stone-700 hover:bg-stone-50 transition-all"
+              >
+                Отмена
+              </button>
+              <button
+                type="button"
+                onClick={deleteAccount}
+                className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-sm transition-all"
+              >
+                Да, удалить аккаунт
+              </button>
+            </div>
           </div>
+        ) : (
+          /* Account Actions: Logout & Delete */
+          <div className="pt-6 border-t border-sand-200 flex items-center justify-between">
+            <button
+              type="button"
+              onClick={logout}
+              className="px-4 py-2 rounded-xl border border-sand-300 text-stone-600 hover:bg-sand-100 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+            >
+              <LogOut size={14} />
+              <span>Выйти</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={logout}
-            className="px-4 py-2 rounded-xl border border-red-200 text-red-600 hover:bg-red-50 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
-          >
-            <LogOut size={14} />
-            <span>Выйти из аккаунта</span>
-          </button>
-        </div>
+            <button
+              type="button"
+              onClick={() => setIsDeleteConfirmOpen(true)}
+              className="px-4 py-2 rounded-xl text-red-600 hover:bg-red-50 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+            >
+              <span>Удалить аккаунт</span>
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
