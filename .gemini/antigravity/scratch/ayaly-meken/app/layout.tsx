@@ -26,7 +26,25 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "Ayaly Meken — Апартаменты в Казахстане",
   description: "Умные апартаменты с бесконтактным заездом в Алматы, Астане и Шымкенте. Мгновенное бронирование, цифровой ПИН-код, гостиничный уровень сервиса.",
-  keywords: ["аренда апартаментов Алматы", "посуточно Астана", "TTLock бесконтактный заезд"],
+  keywords: ["аренда апартаментов Алматы", "посуточно Астана", "TTLock бесконтактный заезд", "Аялы Мекен"],
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Ayaly Meken",
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.png", sizes: "64x64", type: "image/png" },
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    shortcut: "/favicon.svg",
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
 };
 
 export const viewport: Viewport = {
@@ -34,6 +52,8 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

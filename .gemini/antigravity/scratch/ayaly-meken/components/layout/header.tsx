@@ -20,8 +20,9 @@ export function Header() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Brand Logo */}
         <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-900 text-cream-100 shadow-md shadow-emerald-950/20 group-hover:scale-105 transition-transform">
-            <Sparkles className="h-5 w-5 text-amber-300" />
+          <div className="relative flex h-10 w-10 overflow-hidden rounded-2xl bg-emerald-950 shadow-md shadow-emerald-950/20 group-hover:scale-105 transition-transform border border-amber-400/20">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/favicon.svg" alt="Ayaly Meken Logo" className="w-full h-full object-cover" />
           </div>
           <div className="flex flex-col">
             <span className="font-serif text-xl font-bold tracking-tight text-emerald-950 leading-none">

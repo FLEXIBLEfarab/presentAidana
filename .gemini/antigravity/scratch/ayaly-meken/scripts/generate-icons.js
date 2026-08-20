@@ -1,0 +1,71 @@
+const sharp = require('C:/Users/flexi/.gemini/antigravity/scratch/aura-pms/node_modules/sharp');
+const fs = require('fs');
+const path = require('path');
+
+const publicDir = path.resolve('public');
+const iconsDir = path.resolve('public/icons');
+
+if (!fs.existsSync(publicDir)) fs.mkdirSync(publicDir, { recursive: true });
+if (!fs.existsSync(iconsDir)) fs.mkdirSync(iconsDir, { recursive: true });
+
+const svgSquare = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#022c22" />
+      <stop offset="50%" stop-color="#064e3b" />
+      <stop offset="100%" stop-color="#065f46" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FEF08A" />
+      <stop offset="35%" stop-color="#FBBF24" />
+      <stop offset="100%" stop-color="#D97706" />
+    </linearGradient>
+  </defs>
+
+  <!-- Solid Emerald Background -->
+  <rect width="512" height="512" fill="url(#bgGrad)"/>
+  
+  <!-- Subtle Ornamental Ring -->
+  <circle cx="256" cy="256" r="190" fill="none" stroke="#FBBF24" stroke-width="2.5" stroke-opacity="0.25" stroke-dasharray="6 6"/>
+
+  <!-- Shanyrak / Yurt Emblem -->
+  <g transform="translate(0, -18)">
+    <!-- Golden Arch Dome -->
+    <path d="M 130 330 C 130 205, 382 205, 382 330" fill="none" stroke="url(#goldGrad)" stroke-width="22" stroke-linecap="round"/>
+    
+    <!-- Shanyrak Circle & Cross -->
+    <circle cx="256" cy="228" r="52" fill="none" stroke="url(#goldGrad)" stroke-width="16"/>
+    <line x1="256" y1="176" x2="256" y2="280" stroke="url(#goldGrad)" stroke-width="12" stroke-linecap="round"/>
+    <line x1="204" y1="228" x2="308" y2="228" stroke="url(#goldGrad)" stroke-width="12" stroke-linecap="round"/>
+    <line x1="219" y1="191" x2="293" y2="265" stroke="url(#goldGrad)" stroke-width="10" stroke-linecap="round"/>
+    <line x1="219" y1="265" x2="293" y2="191" stroke="url(#goldGrad)" stroke-width="10" stroke-linecap="round"/>
+
+    <!-- 4-point Golden Star Sparkle -->
+    <path d="M 256 82 Q 256 128 302 128 Q 256 128 256 174 Q 256 128 210 128 Q 256 128 256 82 Z" fill="url(#goldGrad)"/>
+    <circle cx="256" cy="128" r="7" fill="#FFFFFF"/>
+  </g>
+
+  <!-- Typography -->
+  <text x="256" y="412" font-family="-apple-system, BlinkMacSystemFont, 'Cinzel', 'Playfair Display', 'Georgia', serif" font-size="62" font-weight="900" letter-spacing="10" fill="url(#goldGrad)" text-anchor="middle">AYALY</text>
+  <text x="256" y="446" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="700" letter-spacing="7" fill="#A7F3D0" text-anchor="middle" opacity="0.9">MEKEN</text>
+</svg>`;
+
+fs.writeFileSync('public/favicon.svg', svgSquare.trim());
+fs.writeFileSync('public/icons/icon-512.svg', svgSquare.trim());
+fs.writeFileSync('public/icons/icon-192.svg', svgSquare.trim());
+
+async function buildPngs() {
+  const buf = Buffer.from(svgSquare);
+  
+  await sharp(buf).resize(512, 512).png().toFile('public/icons/icon-512.png');
+  await sharp(buf).resize(192, 192).png().toFile('public/icons/icon-192.png');
+  await sharp(buf).resize(180, 180).png().toFile('public/apple-touch-icon.png');
+  await sharp(buf).resize(180, 180).png().toFile('public/apple-touch-icon-precomposed.png');
+  await sharp(buf).resize(180, 180).png().toFile('public/icons/apple-touch-icon.png');
+  await sharp(buf).resize(64, 64).png().toFile('public/favicon.png');
+  await sharp(buf).resize(32, 32).png().toFile('public/favicon.ico');
+  
+  console.log('SUCCESS: All Ayaly Meken icons generated successfully!');
+}
+
+buildPngs().catch(console.error);
