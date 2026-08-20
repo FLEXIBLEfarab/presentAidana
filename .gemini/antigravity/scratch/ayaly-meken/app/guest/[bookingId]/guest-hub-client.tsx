@@ -28,7 +28,6 @@ interface ServiceOption {
 const SERVICE_OPTIONS: ServiceOption[] = [
   { type: "extra_cleaning", icon: "🧹", label: "Внеплановая уборка", sub: "Профессиональный клининг апартаментов", price: 4000 },
   { type: "extra_linen", icon: "🛏️", label: "Доп. комплект белья", sub: "Свежие полотенца, постельное бельё и подушки", price: 2000 },
-  { type: "late_checkout", icon: "⏰", label: "Поздний выезд (до 15:00)", sub: "Освободите апартаменты до 15:00 вместо 12:00" },
   { type: "issue_report", icon: "⚠️", label: "Сообщить о неисправности", sub: "Сантехника, техника, мебель или другая проблема", requiresNote: true, requiresPhoto: true },
 ];
 

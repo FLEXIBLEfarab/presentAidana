@@ -228,9 +228,8 @@ export async function createServiceRequest(input: {
   try {
     const supabase = createClient();
 
-    // 1. Extra Cleaning (Внеплановая уборка)
+    // 1. Extra Cleaning (Внеплановая уборка) -> отправляется ТОЛЬКО в клининг
     if (input.type === "extra_cleaning") {
-      // Insert into cleaning_tasks for housekeepers
       await supabase.from("cleaning_tasks").insert({
         id: crypto.randomUUID(),
         organization_id: ORG_ID,
@@ -240,21 +239,9 @@ export async function createServiceRequest(input: {
         status: "pending",
         notes: `🧹 Внеплановая уборка (Заказ от гостя Аялы Мекен): ${input.guestNotes || "Просьба провести уборку"} (4 000 ₸)`,
       });
-
-      // Insert into maintenance_issues for managers
-      await supabase.from("maintenance_issues").insert({
-        id: crypto.randomUUID(),
-        organization_id: ORG_ID,
-        apartment_id: input.apartmentId,
-        title: "🧹 Заказ уборки (Аялы Мекен)",
-        description: input.guestNotes || "Гость заказал внеплановую уборку (4 000 ₸)",
-        priority: "urgent",
-        is_resolved: false,
-        cost: 4000,
-      });
     }
 
-    // 2. Extra Linen (Доп. комплект белья)
+    // 2. Extra Linen (Доп. комплект белья) -> отправляется ТОЛЬКО в клининг
     if (input.type === "extra_linen") {
       await supabase.from("cleaning_tasks").insert({
         id: crypto.randomUUID(),
@@ -265,52 +252,9 @@ export async function createServiceRequest(input: {
         status: "pending",
         notes: `🛏️ Доп. комплект белья (Заказ от гостя Аялы Мекен): ${input.guestNotes || "Принести комплект белья и полотенец"} (2 000 ₸)`,
       });
-
-      await supabase.from("maintenance_issues").insert({
-        id: crypto.randomUUID(),
-        organization_id: ORG_ID,
-        apartment_id: input.apartmentId,
-        title: "🛏️ Доп. комплект белья (Аялы Мекен)",
-        description: input.guestNotes || "Гость запросил дополнительный комплект белья (2 000 ₸)",
-        priority: "urgent",
-        is_resolved: false,
-        cost: 2000,
-      });
     }
 
-    // 3. Late Checkout (Поздний выезд до 15:00)
-    if (input.type === "late_checkout") {
-      // Update booking notes in Supabase if bookingId is provided
-      if (input.bookingId) {
-        const { data: b } = await supabase.from("bookings").select("notes").eq("id", input.bookingId).single();
-        const existingNotes = b?.notes || "";
-        const updatedNotes = `[⏰ ПОЗДНИЙ ВЫЕЗД ДО 15:00] ${existingNotes}`.trim();
-        await supabase.from("bookings").update({ notes: updatedNotes }).eq("id", input.bookingId);
-      }
-
-      await supabase.from("cleaning_tasks").insert({
-        id: crypto.randomUUID(),
-        organization_id: ORG_ID,
-        apartment_id: input.apartmentId,
-        booking_id: input.bookingId || null,
-        scheduled_date: new Date().toISOString().split("T")[0],
-        status: "pending",
-        notes: `⏰ ПОЗДНИЙ ВЫЕЗД ДО 15:00! Гость выезжает в 15:00. Уборку начинать после 15:00!`,
-      });
-
-      await supabase.from("maintenance_issues").insert({
-        id: crypto.randomUUID(),
-        organization_id: ORG_ID,
-        apartment_id: input.apartmentId,
-        title: "⏰ Запрос: Поздний выезд до 15:00",
-        description: "Гость запросил поздний выезд до 15:00 вместо 12:00.",
-        priority: "urgent",
-        is_resolved: false,
-        cost: 0,
-      });
-    }
-
-    // 4. Defect / Issue Report (Сообщить о неисправности)
+    // 3. Defect / Issue Report (Сообщить о неисправности) -> отправляется ТОЛЬКО в ремонт
     if (input.type === "issue_report") {
       await supabase.from("maintenance_issues").insert({
         id: crypto.randomUUID(),
