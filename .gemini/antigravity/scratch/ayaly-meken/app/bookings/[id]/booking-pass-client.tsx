@@ -5,10 +5,11 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   KeyRound, Wifi, Copy, Check, MapPin, Clock, MessageCircle, ExternalLink,
-  ChevronLeft, Sparkles, ShieldCheck, LockOpen, Lock, AlertCircle
+  ChevronLeft, Sparkles, ShieldCheck, LockOpen, Lock, AlertCircle, Star, ThumbsUp
 } from "lucide-react";
 import { Booking } from "@/types/database.types";
 import { formatKZT, formatDateRange, isWithinCheckinWindow, buildWhatsAppLink } from "@/lib/utils";
+import { ReviewModal } from "@/components/reviews/review-modal";
 
 interface BookingPassClientProps {
   booking: Booking;
@@ -16,14 +17,20 @@ interface BookingPassClientProps {
 
 export function BookingPassClient({ booking }: BookingPassClientProps) {
   const [copied, setCopied] = useState<string | null>(null);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
   const apt = booking.apartment;
-  const cover = apt?.cover_image || "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1200&auto=format&fit=crop";
+  const isCheckedOut = booking.status === "checked_out";
+  const isCheckedIn = booking.status === "checked_in";
 
-  const pinActive = isWithinCheckinWindow(
-    booking.check_in_date,
-    booking.check_out_date
-  );
+  // PIN is active if checked_in OR within window and confirmed (and not checked_out)
+  const pinActive =
+    !isCheckedOut &&
+    (isCheckedIn ||
+      (booking.status === "confirmed" &&
+        isWithinCheckinWindow(booking.check_in_date, booking.check_out_date)));
+
+  const pinCode = booking.door_pin_code || booking.ttlock_passcode;
 
   const handleCopy = (text: string, key: string) => {
     navigator.clipboard.writeText(text).catch(() => {});
@@ -71,7 +78,13 @@ export function BookingPassClient({ booking }: BookingPassClientProps) {
             <span className="text-[10px] uppercase font-bold text-emerald-300">Бронь</span>
             <div className="font-mono text-sm font-black text-cream-50">#{booking.id.slice(-8).toUpperCase()}</div>
             <div className="text-[10px] mt-0.5 font-bold text-emerald-300">
-              {booking.status === "confirmed" ? "✅ Подтверждено" : booking.status === "pending_payment" ? "⏳ Ожидает оплаты" : booking.status}
+              {isCheckedOut
+                ? "🏁 Проживание завершено"
+                : isCheckedIn
+                ? "🔑 Вы проживаете"
+                : booking.status === "confirmed"
+                ? "✅ Подтверждено"
+                : booking.status}
             </div>
           </div>
         </div>
@@ -93,6 +106,31 @@ export function BookingPassClient({ booking }: BookingPassClientProps) {
         </div>
       </div>
 
+      {/* Review CTA Banner */}
+      <div className="mt-6 rounded-3xl bg-gradient-to-r from-amber-500/10 via-emerald-500/10 to-amber-500/10 border border-amber-300/60 p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+        <div className="flex items-center gap-3 text-left">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-400 text-stone-950 shadow-md shrink-0">
+            <Star className="h-6 w-6 fill-stone-950" />
+          </div>
+          <div>
+            <h3 className="font-serif text-sm sm:text-base font-bold text-emerald-950">
+              {isCheckedOut ? "Поделитесь впечатлениями об отдыхе" : "Как проходит ваше проживание?"}
+            </h3>
+            <p className="text-xs text-stone-600 mt-0.5">
+              Оставьте отзыв и помогите другим путешественникам выбрать лучшее жильё.
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => setIsReviewModalOpen(true)}
+          className="px-5 py-2.5 rounded-2xl bg-emerald-900 hover:bg-emerald-800 text-cream-50 text-xs font-bold shadow-md transition-all hover:scale-105 active:scale-95 shrink-0 flex items-center gap-1.5 cursor-pointer"
+        >
+          <ThumbsUp size={13} className="text-amber-300" />
+          <span>Оставить отзыв</span>
+        </button>
+      </div>
+
       {/* Access Cards Grid */}
       <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Door PIN */}
@@ -107,7 +145,13 @@ export function BookingPassClient({ booking }: BookingPassClientProps) {
                 <p className="text-[11px] text-stone-400">TTLock Smart Lock</p>
               </div>
             </div>
-            {pinActive ? (
+
+            {isCheckedOut ? (
+              <div className="flex items-center gap-1 rounded-full bg-stone-100 px-2.5 py-1 text-[10px] font-bold text-stone-600">
+                <Lock className="h-3 w-3" />
+                <span>Ключ отозван</span>
+              </div>
+            ) : pinActive && pinCode ? (
               <div className="flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-bold text-emerald-900">
                 <LockOpen className="h-3 w-3" />
                 <span>Активен</span>
@@ -120,17 +164,27 @@ export function BookingPassClient({ booking }: BookingPassClientProps) {
             )}
           </div>
 
-          {pinActive ? (
+          {isCheckedOut ? (
+            <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4 flex items-center gap-3 text-xs text-stone-600">
+              <Lock className="h-5 w-5 text-stone-400 shrink-0" />
+              <div>
+                <p className="font-bold text-stone-800">Срок действия ключа завершён</p>
+                <p className="mt-0.5 text-stone-500">
+                  Выезд зарегистрирован. Цифровой ключ TTLock деактивирован в целях безопасности.
+                </p>
+              </div>
+            </div>
+          ) : pinActive && pinCode ? (
             <>
               <div className="rounded-2xl border border-sand-300 bg-cream-50 p-4 flex items-center justify-between">
                 <div>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400">Ваш 6-значный ПИН</span>
                   <div className="font-mono text-3xl font-black text-emerald-950 tracking-widest mt-0.5">
-                    {booking.door_pin_code || "849201"}
+                    {pinCode}
                   </div>
                 </div>
                 <button
-                  onClick={() => handleCopy(booking.door_pin_code || "849201", "pin")}
+                  onClick={() => handleCopy(pinCode, "pin")}
                   className="flex items-center gap-1.5 rounded-xl bg-white px-3.5 py-2 text-xs font-bold text-emerald-900 border border-sand-300 shadow-sm hover:bg-sand-100 active:scale-95"
                 >
                   {copied === "pin" ? <Check className="h-4 w-4 text-emerald-600" /> : <Copy className="h-4 w-4" />}
@@ -141,9 +195,9 @@ export function BookingPassClient({ booking }: BookingPassClientProps) {
               <div className="rounded-xl bg-sand-100/70 p-3 text-xs text-stone-600 space-y-1">
                 <div className="font-bold text-stone-800">Как открыть замок:</div>
                 <ol className="list-decimal list-inside space-y-0.5 text-[11px]">
-                  <li>Коснитесь клавиатуры — загорятся огни</li>
-                  <li>Введите ПИН: <strong className="font-mono">{booking.door_pin_code || "849201"}</strong> и нажмите <strong>#</strong></li>
-                  <li>Поверните ручку вниз при зелёном сигнале и звуке</li>
+                  <li>Коснитесь клавиатуры замка — загорятся цифры</li>
+                  <li>Введите ПИН: <strong className="font-mono">{pinCode}</strong> и нажмите <strong>#</strong></li>
+                  <li>Поверните ручку вниз при зелёном сигнале</li>
                 </ol>
               </div>
             </>
@@ -152,7 +206,7 @@ export function BookingPassClient({ booking }: BookingPassClientProps) {
               <AlertCircle className="h-5 w-5 text-amber-500 shrink-0" />
               <div>
                 <p className="font-bold text-stone-800">ПИН-код активируется в день заезда</p>
-                <p className="mt-0.5">Код станет доступен после {apt?.check_in_time || "14:00"} {booking.check_in_date}.</p>
+                <p className="mt-0.5">Код станет доступен после {apt?.check_in_time || "14:00"} {booking.check_in_date} или при заселении менеджером.</p>
               </div>
             </div>
           )}
@@ -193,55 +247,33 @@ export function BookingPassClient({ booking }: BookingPassClientProps) {
           {apt?.intercom_code && (
             <div className="flex items-center justify-between rounded-xl bg-sand-100/70 p-2.5 text-xs text-stone-700">
               <span>Домофон: <strong className="font-mono">{apt.intercom_code}</strong></span>
-              <button onClick={() => handleCopy(apt.intercom_code!, "intercom")} className="text-[11px] font-bold text-emerald-800 hover:underline">
-                {copied === "intercom" ? "Скопировано" : "Копировать"}
-              </button>
             </div>
           )}
         </div>
       </div>
 
-      {/* Navigation & Concierge */}
-      <div className="mt-6 rounded-3xl border border-sand-300 bg-white p-6 shadow-soft">
-        <h3 className="font-serif text-base font-bold text-stone-900 mb-4">Маршрут и поддержка</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <a href={maps2gis} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-2xl border border-sand-300 p-3.5 hover:border-emerald-800 transition-colors">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-900 font-black text-sm shrink-0">2G</div>
-            <div><span className="text-xs font-bold text-stone-900">2GIS</span><p className="text-[11px] text-stone-500">Точная навигация</p></div>
-            <ExternalLink className="h-4 w-4 text-stone-400 ml-auto" />
-          </a>
-
-          <a href={yandexMaps} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-2xl border border-sand-300 p-3.5 hover:border-emerald-800 transition-colors">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-50 text-red-600 font-black text-sm shrink-0">Я</div>
-            <div><span className="text-xs font-bold text-stone-900">Яндекс Карты</span><p className="text-[11px] text-stone-500">Пробки и маршрут</p></div>
-            <ExternalLink className="h-4 w-4 text-stone-400 ml-auto" />
-          </a>
-
-          <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-3.5 hover:bg-emerald-50 transition-colors">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-700 text-white shrink-0">
-              <MessageCircle className="h-5 w-5" />
-            </div>
-            <div><span className="text-xs font-bold text-emerald-950">WhatsApp 24/7</span><p className="text-[11px] text-emerald-700">Консьерж хозяина</p></div>
-            <ExternalLink className="h-4 w-4 text-emerald-700 ml-auto" />
-          </a>
+      {/* Concierge Link Banner */}
+      <div className="mt-6 rounded-3xl bg-white border border-sand-300 p-6 shadow-soft flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+          <h3 className="font-serif text-base font-bold text-emerald-950">Нужна уборка или дополнительное бельё?</h3>
+          <p className="text-xs text-stone-500 mt-1">Закажите услуги консьержа в 1 клик прямо в приложении.</p>
         </div>
-      </div>
-
-      {/* Concierge Services Link */}
-      <div className="mt-6">
         <Link
           href={`/guest/${booking.id}`}
-          className="flex items-center justify-between rounded-3xl border border-sand-300 bg-gradient-to-r from-cream-50 to-sand-100 p-5 shadow-soft hover:shadow-card transition-all group"
+          className="px-5 py-2.5 rounded-2xl bg-emerald-900 hover:bg-emerald-800 text-cream-50 text-xs font-bold shadow-sm transition-all hover:scale-105 shrink-0"
         >
-          <div>
-            <h3 className="font-serif text-base font-bold text-stone-900 group-hover:text-emerald-900">Консьерж-услуги 🛎️</h3>
-            <p className="text-xs text-stone-500 mt-0.5">Уборка, бельё, поздний выезд и сообщение о неисправностях</p>
-          </div>
-          <div className="rounded-full bg-emerald-900 p-2.5 text-cream-50 group-hover:scale-110 transition-transform">
-            <ChevronLeft className="h-5 w-5 rotate-180" />
-          </div>
+          Консьерж-сервис 🛎️
         </Link>
       </div>
+
+      {/* Review Modal */}
+      <ReviewModal
+        isOpen={isReviewModalOpen}
+        onClose={() => setIsReviewModalOpen(false)}
+        apartmentId={booking.apartment_id}
+        apartmentName={apt?.name || "Апартаменты"}
+        bookingId={booking.id}
+      />
     </div>
   );
 }

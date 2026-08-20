@@ -8,8 +8,9 @@ import { getBookings } from "@/actions/bookings";
 import { Booking } from "@/types/database.types";
 import { formatKZT, formatDateRange } from "@/lib/utils";
 import {
-  Luggage, Calendar, KeyRound, ChevronRight, Sparkles, MapPin, Clock, MessageCircle, User, LogIn, Loader2
+  Luggage, Calendar, KeyRound, ChevronRight, Sparkles, MapPin, Clock, MessageCircle, User, LogIn, Loader2, Star, ThumbsUp
 } from "lucide-react";
+import { ReviewModal } from "@/components/reviews/review-modal";
 
 const statusLabels: Record<string, string> = {
   confirmed: "✅ Подтверждено",
@@ -24,6 +25,7 @@ export function BookingsClient({ initialBookings }: { initialBookings: Booking[]
   const { user, isLoading: isAuthLoading, openAuthModal } = useGuestAuth();
   const [bookings, setBookings] = useState<Booking[]>(initialBookings);
   const [isLoading, setIsLoading] = useState(false);
+  const [reviewBooking, setReviewBooking] = useState<Booking | null>(null);
 
   useEffect(() => {
     async function loadUserBookings() {
@@ -126,6 +128,10 @@ export function BookingsClient({ initialBookings }: { initialBookings: Booking[]
               apt?.cover_image ||
               "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1200&auto=format&fit=crop";
             const statusLabel = statusLabels[booking.status] || booking.status;
+            const isCheckedOut = booking.status === "checked_out";
+            const pinDisplay = isCheckedOut
+              ? "Отозван"
+              : booking.door_pin_code || booking.ttlock_passcode || "—";
 
             return (
               <div
@@ -187,8 +193,8 @@ export function BookingsClient({ initialBookings }: { initialBookings: Booking[]
                           <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400">
                             Цифровой ПИН
                           </span>
-                          <div className="font-mono text-sm font-black text-emerald-950 tracking-wider">
-                            {booking.door_pin_code || booking.ttlock_passcode || "—"}
+                          <div className={`font-mono text-sm font-black tracking-wider ${isCheckedOut ? "text-stone-400" : "text-emerald-950"}`}>
+                            {pinDisplay}
                           </div>
                         </div>
                       </div>
@@ -197,6 +203,16 @@ export function BookingsClient({ initialBookings }: { initialBookings: Booking[]
                         <span className="text-sm font-extrabold text-stone-900">
                           {formatKZT(booking.total_price)}
                         </span>
+
+                        {/* Review button */}
+                        <button
+                          type="button"
+                          onClick={() => setReviewBooking(booking)}
+                          className="flex items-center gap-1.5 rounded-2xl border border-amber-400 bg-amber-50/80 px-3 py-2 text-xs font-bold text-amber-900 hover:bg-amber-100 transition-all cursor-pointer"
+                        >
+                          <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
+                          <span>Отзыв</span>
+                        </button>
 
                         <Link
                           href={`/guest/${booking.id}`}
@@ -210,7 +226,7 @@ export function BookingsClient({ initialBookings }: { initialBookings: Booking[]
                           href={`/bookings/${booking.id}`}
                           className="flex items-center gap-1.5 rounded-2xl bg-emerald-900 px-4 py-2.5 text-xs font-bold text-cream-50 shadow-sm hover:bg-emerald-800 transition-all"
                         >
-                          <span>Открыть карту</span>
+                          <span>Ключи и карта</span>
                           <ChevronRight className="h-3.5 w-3.5" />
                         </Link>
                       </div>
@@ -225,19 +241,31 @@ export function BookingsClient({ initialBookings }: { initialBookings: Booking[]
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-800 mb-3">
               <Luggage className="h-7 w-7" />
             </div>
-            <h3 className="font-serif text-lg font-bold text-stone-900">У вас пока нет активных бронирований</h3>
+            <h3 className="font-serif text-lg font-bold text-stone-900">Поездок пока нет</h3>
             <p className="mt-1 text-xs text-stone-500 max-w-sm mx-auto">
-              Выберите понравившуюся квартиру в Астане или Алматы и забронируйте её онлайн с бесконтактным заселением.
+              Выберите понравившиеся апартаменты в Алматы, Астане или Шымкенте и забронируйте онлайн в 1 клик.
             </p>
             <Link
               href="/"
               className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-emerald-900 px-6 py-3 text-xs font-bold text-cream-50 shadow-md hover:bg-emerald-800"
             >
+              <Sparkles className="h-4 w-4 text-amber-300" />
               <span>Найти апартаменты</span>
             </Link>
           </div>
         )}
       </div>
+
+      {/* Review Modal */}
+      {reviewBooking && (
+        <ReviewModal
+          isOpen={true}
+          onClose={() => setReviewBooking(null)}
+          apartmentId={reviewBooking.apartment_id}
+          apartmentName={reviewBooking.apartment?.name || "Апартаменты"}
+          bookingId={reviewBooking.id}
+        />
+      )}
     </div>
   );
 }

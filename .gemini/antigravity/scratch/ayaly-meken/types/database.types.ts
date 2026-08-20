@@ -152,12 +152,18 @@ export interface ServiceRequest {
 export interface Review {
   id: string;
   apartment_id: string;
+  booking_id?: string | null;
   author_name: string;
+  guest_name?: string;
   author_avatar?: string;
   author_city?: string;
   rating: number;
-  date: string;
+  date?: string;
+  created_at?: string;
   comment: string;
+  cleanliness_rating?: number;
+  location_rating?: number;
+  checkin_rating?: number;
 }
 
 export interface SearchFilters {

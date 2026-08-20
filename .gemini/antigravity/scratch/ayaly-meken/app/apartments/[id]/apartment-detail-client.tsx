@@ -11,6 +11,7 @@ import {
 import { Apartment, Review } from "@/types/database.types";
 import { BookingWidget } from "@/components/apartments/booking-widget";
 import { GalleryModal } from "@/components/apartments/gallery-modal";
+import { ReviewModal } from "@/components/reviews/review-modal";
 import { cn } from "@/lib/utils";
 
 interface ApartmentDetailClientProps {
@@ -22,6 +23,7 @@ export function ApartmentDetailClient({ apartment, reviews }: ApartmentDetailCli
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [isRulesOpen, setIsRulesOpen] = useState(false);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
   const images = apartment.images && apartment.images.length > 0
     ? apartment.images
@@ -233,21 +235,33 @@ export function ApartmentDetailClient({ apartment, reviews }: ApartmentDetailCli
 
           {/* Reviews */}
           <div className="rounded-3xl border border-sand-300 bg-white p-6 shadow-soft">
-            <div className="flex items-center gap-2 pb-4 border-b border-sand-200">
-              <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
-              <h3 className="font-serif text-lg font-bold text-stone-900">
-                {apartment.rating || "4.95"} · {reviews.length || 3} отзыва гостей
-              </h3>
+            <div className="flex items-center justify-between pb-4 border-b border-sand-200 flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
+                <h3 className="font-serif text-lg font-bold text-stone-900">
+                  {apartment.rating || "4.95"} · {reviews.length || 3} отзыва гостей
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsReviewModalOpen(true)}
+                className="px-4 py-2 rounded-2xl bg-sand-100 hover:bg-amber-100 text-stone-800 hover:text-amber-900 border border-sand-300 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
+              >
+                <Star size={13} className="text-amber-500 fill-amber-500" />
+                <span>Написать отзыв</span>
+              </button>
             </div>
             <div className="mt-6 space-y-6">
               {reviews.map((rev) => (
                 <div key={rev.id} className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-stone-900">{rev.author_name} {rev.author_city ? `· ${rev.author_city}` : ""}</span>
-                    <span className="text-[11px] text-stone-400">{rev.date}</span>
+                    <span className="text-xs font-bold text-stone-900">
+                      {rev.author_name || rev.guest_name || "Гость"} {rev.author_city ? `· ${rev.author_city}` : ""}
+                    </span>
+                    <span className="text-[11px] text-stone-400">{rev.date || (rev.created_at ? new Date(rev.created_at).toLocaleDateString("ru-RU") : "Недавно")}</span>
                   </div>
                   <div className="flex items-center gap-0.5">
-                    {Array.from({ length: rev.rating }).map((_, i) => (
+                    {Array.from({ length: rev.rating || 5 }).map((_, i) => (
                       <Star key={i} className="h-3 w-3 fill-amber-400 text-amber-400" />
                     ))}
                   </div>
@@ -265,6 +279,14 @@ export function ApartmentDetailClient({ apartment, reviews }: ApartmentDetailCli
           </div>
         </div>
       </div>
+
+      {/* Review Modal */}
+      <ReviewModal
+        isOpen={isReviewModalOpen}
+        onClose={() => setIsReviewModalOpen(false)}
+        apartmentId={apartment.id}
+        apartmentName={apartment.name}
+      />
     </div>
   );
 }
