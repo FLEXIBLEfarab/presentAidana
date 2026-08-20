@@ -24,21 +24,24 @@ function createPriceIcon(price: number, isActive: boolean): L.DivIcon {
   return L.divIcon({
     html: `
       <div style="
-        background: ${isActive ? "#064e3b" : "#ffffff"};
-        color: ${isActive ? "#fef9e7" : "#064e3b"};
-        border: 2px solid ${isActive ? "#064e3b" : "#d1fae5"};
-        border-radius: 100px;
-        padding: 4px 10px;
+        background: ${isActive ? "#022c22" : "#064e3b"};
+        color: #ffffff;
+        border: 2px solid ${isActive ? "#fbbf24" : "rgba(255,255,255,0.9)"};
+        border-radius: 9999px;
+        padding: 5px 12px;
         font-weight: 800;
-        font-size: 11px;
+        font-size: 12px;
         white-space: nowrap;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        transform: translateX(-50%) translateY(-50%);
+        box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+        transform: translate(-50%, -50%) ${isActive ? "scale(1.1)" : "scale(1)"};
         cursor: pointer;
-        transition: all 0.2s;
-        font-family: system-ui, sans-serif;
+        transition: all 0.2s ease-in-out;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        display: flex;
+        align-items: center;
+        gap: 4px;
       ">
-        ${Math.round(price / 1000)} тыс ₸
+        <span>${Math.round(price / 1000)} тыс ₸</span>
       </div>
     `,
     className: "",
@@ -55,50 +58,73 @@ export default function LeafletMap({ apartments, activeId, onApartmentClick }: L
   const validApts = apartments.filter((a) => a.lat && a.lng);
 
   useEffect(() => {
-    if (!containerRef.current || mapRef.current) return;
+    if (!containerRef.current) return;
 
-    // Calculate center from apartments
-    const center: [number, number] =
-      validApts.length > 0
-        ? [
-            validApts.reduce((s, a) => s + (a.lat || 0), 0) / validApts.length,
-            validApts.reduce((s, a) => s + (a.lng || 0), 0) / validApts.length,
-          ]
-        : [43.24, 76.93];
+    if (!mapRef.current) {
+      const defaultCenter: [number, number] =
+        validApts.length > 0
+          ? [
+              validApts.reduce((s, a) => s + (a.lat || 0), 0) / validApts.length,
+              validApts.reduce((s, a) => s + (a.lng || 0), 0) / validApts.length,
+            ]
+          : [51.128, 71.430];
 
-    const map = L.map(containerRef.current, {
-      center,
-      zoom: 12,
-      zoomControl: false,
+      const map = L.map(containerRef.current, {
+        center: defaultCenter,
+        zoom: 12,
+        zoomControl: false,
+      });
+
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+        attribution: "© OpenStreetMap © CARTO",
+        subdomains: "abcd",
+        maxZoom: 19,
+      }).addTo(map);
+
+      L.control.zoom({ position: "bottomright" }).addTo(map);
+
+      mapRef.current = map;
+
+      // Invalidate size shortly after mounting to prevent gray tiles
+      setTimeout(() => {
+        map.invalidateSize();
+      }, 250);
+    }
+
+    const map = mapRef.current;
+    if (!map) return;
+
+    // Clear old markers
+    Object.values(markersRef.current).forEach((marker) => {
+      marker.remove();
     });
+    markersRef.current = {};
 
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-      attribution: "© OpenStreetMap © CARTO",
-      subdomains: "abcd",
-      maxZoom: 19,
-    }).addTo(map);
+    if (validApts.length === 0) return;
 
-    // Add zoom control bottom-right
-    L.control.zoom({ position: "bottomright" }).addTo(map);
+    const bounds = L.latLngBounds([]);
 
-    mapRef.current = map;
-
-    // Add markers
+    // Add new markers
     validApts.forEach((apt) => {
       const isActive = apt.id === activeId;
-      const marker = L.marker([apt.lat!, apt.lng!], {
+      const latLng: [number, number] = [apt.lat!, apt.lng!];
+      bounds.extend(latLng);
+
+      const marker = L.marker(latLng, {
         icon: createPriceIcon(apt.base_night_price, isActive),
       })
         .addTo(map)
         .bindPopup(
-          `<div style="font-family: system-ui; min-width: 180px; padding: 4px;">
-            <img src="${apt.cover_image}" style="width:100%;height:100px;object-fit:cover;border-radius:8px;margin-bottom:6px" />
-            <div style="font-weight:700;font-size:12px;color:#064e3b;margin-bottom:2px">${apt.name}</div>
-            <div style="font-size:11px;color:#6b7280">${apt.district || apt.city}</div>
-            <div style="font-weight:800;font-size:14px;color:#064e3b;margin-top:4px">${formatKZT(apt.base_night_price)} <span style="font-weight:400;font-size:11px">/ночь</span></div>
-            <a href="/apartments/${apt.id}" style="display:block;margin-top:6px;background:#064e3b;color:white;text-align:center;padding:5px 8px;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none">Подробнее</a>
+          `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; min-width: 200px; padding: 2px;">
+            <img src="${apt.cover_image || 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=600'}" style="width:100%;height:110px;object-fit:cover;border-radius:12px;margin-bottom:8px" />
+            <div style="font-weight:700;font-size:13px;color:#022c22;margin-bottom:2px">${apt.name}</div>
+            <div style="font-size:11px;color:#6b7280;margin-bottom:6px">${apt.district ? `${apt.district}, ` : ''}${apt.city}</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;">
+              <span style="font-weight:800;font-size:14px;color:#064e3b">${formatKZT(apt.base_night_price)} <span style="font-weight:400;font-size:11px;color:#6b7280">/ночь</span></span>
+              <a href="/apartments/${apt.id}" style="background:#064e3b;color:white;text-align:center;padding:5px 12px;border-radius:8px;font-size:11px;font-weight:700;text-decoration:none;display:inline-block">Забронировать</a>
+            </div>
           </div>`,
-          { maxWidth: 220 }
+          { maxWidth: 240, className: "custom-leaflet-popup" }
         );
 
       marker.on("click", () => {
@@ -108,16 +134,14 @@ export default function LeafletMap({ apartments, activeId, onApartmentClick }: L
       markersRef.current[apt.id] = marker;
     });
 
-    return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (validApts.length > 0) {
+      map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+    }
 
-  // Update marker icons when activeId changes
+    return () => {};
+  }, [apartments]);
+
+  // Highlight active marker and pan
   useEffect(() => {
     if (!mapRef.current) return;
 
@@ -128,27 +152,15 @@ export default function LeafletMap({ apartments, activeId, onApartmentClick }: L
         marker.setIcon(createPriceIcon(apt.base_night_price, isActive));
         if (isActive && apt.lat && apt.lng) {
           mapRef.current?.panTo([apt.lat, apt.lng], { animate: true, duration: 0.5 });
+          marker.openPopup();
         }
       }
     });
   }, [activeId, validApts]);
 
-  if (validApts.length === 0) {
-    return (
-      <div className="flex h-full w-full items-center justify-center bg-sand-100 rounded-3xl">
-        <div className="text-center text-stone-400">
-          <div className="text-3xl mb-2">🗺️</div>
-          <p className="text-xs font-medium">Нет апартаментов с координатами</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div
-      ref={containerRef}
-      className="h-full w-full rounded-3xl overflow-hidden"
-      style={{ minHeight: "400px" }}
-    />
+    <div className="relative h-full w-full overflow-hidden rounded-3xl border border-sand-300 shadow-soft">
+      <div ref={containerRef} className="h-full w-full" />
+    </div>
   );
 }

@@ -5,8 +5,43 @@ import { MOCK_APARTMENTS } from "@/lib/mock-data";
 import { Apartment, SearchFilters, Result } from "@/types/database.types";
 import { applyFiltersAndSort } from "@/lib/search-filters";
 
+function getCoordinatesForApartment(apt: any): { lat: number; lng: number } {
+  if (apt.lat && apt.lng) return { lat: Number(apt.lat), lng: Number(apt.lng) };
+
+  const city = (apt.city || "").toLowerCase();
+  let baseLat = 51.128;
+  let baseLng = 71.430; // Astana default
+
+  if (city.includes("алмат") || city.includes("almat")) {
+    baseLat = 43.238;
+    baseLng = 76.945; // Almaty
+  } else if (city.includes("шымкент") || city.includes("shymk")) {
+    baseLat = 42.315;
+    baseLng = 69.587; // Shymkent
+  } else if (city.includes("астан") || city.includes("astan") || city.includes("нур-султан")) {
+    baseLat = 51.128;
+    baseLng = 71.430; // Astana
+  }
+
+  const idStr = String(apt.id || "1");
+  let hash = 0;
+  for (let i = 0; i < idStr.length; i++) {
+    hash = (hash << 5) - hash + idStr.charCodeAt(i);
+    hash |= 0;
+  }
+  const offsetLat = ((Math.abs(hash) % 100) - 50) * 0.0004;
+  const offsetLng = ((Math.abs(hash >> 3) % 100) - 50) * 0.0004;
+
+  return {
+    lat: Number((baseLat + offsetLat).toFixed(6)),
+    lng: Number((baseLng + offsetLng).toFixed(6)),
+  };
+}
+
 function enrichApartment(apt: any): Apartment {
   const match = MOCK_APARTMENTS.find((m) => m.id === apt.id);
+  const coords = getCoordinatesForApartment(apt);
+
   return {
     ...apt,
     cover_image:
@@ -47,8 +82,8 @@ function enrichApartment(apt: any): Apartment {
       apt.nearby_landmarks || match?.nearby_landmarks || ["Центральный парк", "ТРЦ", "Кофейни"],
     rating: apt.rating || match?.rating || 4.95,
     reviews_count: apt.reviews_count || match?.reviews_count || 38,
-    lat: apt.lat || match?.lat || 51.130,
-    lng: apt.lng || match?.lng || 71.430,
+    lat: coords.lat,
+    lng: coords.lng,
     wifi_name: apt.wifi_name || match?.wifi_name || "AyalyMeken_Guest",
     wifi_password: apt.wifi_password || match?.wifi_password || "AltynGuest2026",
     intercom_code: apt.intercom_code || match?.intercom_code || "101K",

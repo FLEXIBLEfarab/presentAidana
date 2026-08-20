@@ -31,6 +31,7 @@ export default async function MapPage({ searchParams }: MapPageProps) {
     <SearchShell
       initialApartments={apartments}
       initialFilters={{ ...filters, sortBy: "recommended" }}
+      defaultView="map"
     />
   );
 }

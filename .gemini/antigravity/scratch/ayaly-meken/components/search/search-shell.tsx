@@ -13,11 +13,12 @@ import { cn } from "@/lib/utils";
 interface SearchShellProps {
   initialApartments: Apartment[];
   initialFilters: SearchFilters;
+  defaultView?: "list" | "map";
 }
 
-export function SearchShell({ initialApartments, initialFilters }: SearchShellProps) {
+export function SearchShell({ initialApartments, initialFilters, defaultView = "list" }: SearchShellProps) {
   const [filters, setFilters] = useState<SearchFilters>(initialFilters);
-  const [viewMode, setViewMode] = useState<"list" | "map">("list");
+  const [viewMode, setViewMode] = useState<"list" | "map">(defaultView);
   const [activeId, setActiveId] = useState<string | null>(null);
 
   const apartments = applyFiltersAndSort(initialApartments, filters);

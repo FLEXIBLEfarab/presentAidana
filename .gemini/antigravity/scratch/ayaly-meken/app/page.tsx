@@ -88,7 +88,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               <strong className="text-emerald-950 font-bold">{apartments.length}</strong> вариантов
             </span>
             <Link
-              href="/map"
+              href={cityFilter && cityFilter !== "All" ? `/map?city=${cityFilter}` : "/map"}
               className="flex items-center gap-1.5 rounded-full border border-sand-300 bg-white px-3.5 py-1.5 text-xs font-bold text-stone-700 hover:border-emerald-800 transition-colors shadow-sm"
             >
               <Map className="h-3.5 w-3.5 text-emerald-700" />
@@ -109,15 +109,25 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-800 mb-3">
               <MapPin className="h-7 w-7" />
             </div>
-            <h3 className="font-serif text-lg font-bold text-stone-900">Ничего не найдено</h3>
-            <p className="mt-1 text-xs text-stone-500 max-w-sm mx-auto">
-              Попробуйте другой город или измените параметры поиска.
-            </p>
-            <Link href="/" className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-emerald-900 px-5 py-2.5 text-xs font-bold text-cream-50 shadow-sm hover:bg-emerald-800">
-              Сбросить фильтры
+            <h3 className="font-serif text-lg font-bold text-emerald-950">В этом городе пока нет вариантов</h3>
+            <p className="mt-1 text-xs text-stone-500">Попробуйте выбрать другой город или сбросить фильтры.</p>
+            <Link href="/" className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-emerald-900 px-5 py-2 text-xs font-bold text-cream-50 hover:bg-emerald-800">
+              <span>Смотреть все города</span>
+              <ArrowRight className="h-3.5 w-3.5 text-amber-300" />
             </Link>
           </div>
         )}
+
+        {/* Floating Map Pill Button */}
+        <div className="fixed bottom-20 md:bottom-8 left-1/2 -translate-x-1/2 z-30">
+          <Link
+            href={cityFilter && cityFilter !== "All" ? `/map?city=${cityFilter}` : "/map"}
+            className="flex items-center gap-2 rounded-full bg-emerald-950/95 hover:bg-emerald-900 text-cream-50 px-5 py-2.5 text-xs font-bold shadow-xl shadow-emerald-950/30 border border-emerald-800/50 backdrop-blur-md transition-all hover:scale-105 active:scale-95"
+          >
+            <Map className="h-4 w-4 text-amber-300" />
+            <span>Показать на карте</span>
+          </Link>
+        </div>
 
         {/* TTLock Digital Access Banner */}
         <div className="mt-16 overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-900 to-emerald-950 p-8 text-cream-50 sm:p-12 shadow-card">
