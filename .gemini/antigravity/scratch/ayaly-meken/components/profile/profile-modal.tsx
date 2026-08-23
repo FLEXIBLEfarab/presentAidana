@@ -250,7 +250,7 @@ export function ProfileModal() {
                 type="text"
                 value={promoInput}
                 onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
-                placeholder="Введите промокод (напр. AYALY)"
+                placeholder="Введите ваш промокод"
                 className="w-full h-10 rounded-xl border border-sand-300 bg-sand-50/50 pl-8 pr-3 text-xs font-bold uppercase tracking-wider text-emerald-950 placeholder:normal-case placeholder:font-normal placeholder:tracking-normal focus:bg-white focus:border-emerald-700 focus:outline-none transition-all"
               />
             </div>
@@ -287,39 +287,6 @@ export function ProfileModal() {
               <span>{promoMessage.text}</span>
             </div>
           )}
-
-          {/* Quick clickable promo suggestions */}
-          <div className="mt-3">
-            <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-1.5">
-              Доступные промокоды:
-            </span>
-            <div className="flex flex-wrap gap-1.5">
-              {[
-                { code: "AYALY", desc: "+3 000 ₸" },
-                { code: "WELCOME", desc: "+5 000 ₸" },
-                { code: "VIPGUEST", desc: "+10 000 ₸" },
-              ].map(({ code, desc }) => {
-                const isActivated = user.promocodes?.includes(code);
-                return (
-                  <button
-                    key={code}
-                    type="button"
-                    disabled={isActivated}
-                    onClick={() => handleApplyPromo(undefined, code)}
-                    className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${
-                      isActivated
-                        ? "bg-emerald-50 text-emerald-700 border border-emerald-200 opacity-80 cursor-default"
-                        : "bg-sand-100 hover:bg-amber-100 text-stone-700 hover:text-amber-900 border border-sand-300 cursor-pointer"
-                    }`}
-                  >
-                    <span>🎟️ {code}</span>
-                    <span className="text-stone-400">({desc})</span>
-                    {isActivated && <Check size={10} className="text-emerald-600 ml-0.5" />}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
         </div>
 
         {/* Edit Profile Form */}
