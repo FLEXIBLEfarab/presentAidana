@@ -28,6 +28,18 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const GUEST_STORAGE_KEY = "ayaly_meken_guest_user";
 const GUESTS_REGISTRY_KEY = "ayaly_meken_registered_guests";
+export function validatePasswordSecurity(password: string): string | null {
+  if (!password || password.length < 6) {
+    return "Пароль должен содержать минимум 6 символов.";
+  }
+  if (!/[A-Z]/.test(password)) {
+    return "Пароль должен содержать хотя бы одну заглавную латинскую букву (A-Z).";
+  }
+  if (!/^[A-Za-z0-9.,_\-!#@~]+$/.test(password)) {
+    return "Пароль может содержать только латинские буквы, цифры и символы (. , _ - ! # @ ~).";
+  }
+  return null;
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<GuestUser | null>(null);
@@ -117,8 +129,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!cleanPhone || cleanPhone.replace(/\D/g, "").length < 11) {
       return { success: false, error: "Введите корректный номер телефона (+7...)" };
     }
-    if (!data.password || data.password.length < 6) {
-      return { success: false, error: "Пароль должен содержать минимум 6 символов" };
+    
+    const pwdErr = validatePasswordSecurity(data.password || "");
+    if (pwdErr) {
+      return { success: false, error: pwdErr };
     }
 
     try {
@@ -256,8 +270,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (cleanCode !== "202681" && cleanCode !== "8181") {
       return { success: false, error: "Неверный код подтверждения" };
     }
-    if (!newPass || newPass.length < 6) {
-      return { success: false, error: "Пароль должен содержать минимум 6 символов" };
+    const pwdErr = validatePasswordSecurity(newPass);
+    if (pwdErr) {
+      return { success: false, error: pwdErr };
     }
 
     try {
