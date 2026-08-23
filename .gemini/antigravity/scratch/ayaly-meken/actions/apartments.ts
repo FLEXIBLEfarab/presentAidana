@@ -128,7 +128,7 @@ export async function getApartments(
 
     let apartments: Apartment[] = [];
 
-    if (!error && dbApartments && dbApartments.length > 0) {
+    if (!error && Array.isArray(dbApartments)) {
       apartments = dbApartments.map(enrichApartment);
     } else {
       apartments = [...MOCK_APARTMENTS];
