@@ -80,6 +80,24 @@ export async function createBooking(
 
   try {
     const supabase = createClient();
+
+    // Check for date overlap before creating booking
+    const { data: overlapping } = await supabase
+      .from("bookings")
+      .select("id, check_in_date, check_out_date, guest_name")
+      .eq("apartment_id", input.apartmentId)
+      .neq("status", "cancelled")
+      .lt("check_in_date", input.checkOutDate)
+      .gt("check_out_date", input.checkInDate);
+
+    if (overlapping && overlapping.length > 0) {
+      return {
+        success: false,
+        error: `Выбранные даты (${input.checkInDate} — ${input.checkOutDate}) уже заняты другим гостем. Пожалуйста, выберите другие даты в календаре.`,
+        code: "BOOKING_OVERLAP",
+      };
+    }
+
     const { data, error } = await supabase
       .from("bookings")
       .insert(bookingPayload)
