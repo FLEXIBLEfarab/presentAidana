@@ -96,9 +96,17 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-xs font-semibold text-stone-500">
+            <span className="text-xs font-semibold text-stone-500 hidden sm:inline">
               Найдено: <strong className="text-emerald-950 font-bold">{apartments.length}</strong> {apartments.length === 1 ? "вариант" : apartments.length < 5 ? "варианта" : "вариантов"}
             </span>
+
+            <Link
+              href={cityFilter && cityFilter !== "All" ? `/map?city=${cityFilter}` : "/map"}
+              className="inline-flex items-center gap-1.5 rounded-full bg-emerald-950 hover:bg-emerald-900 text-cream-50 px-4 py-2 text-xs font-bold shadow-xs border border-emerald-800/40 transition-all hover:scale-105 active:scale-95"
+            >
+              <Map className="h-3.5 w-3.5 text-amber-300" />
+              <span>На карте</span>
+            </Link>
           </div>
         </div>
 
@@ -123,17 +131,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               </Link>
             </div>
           )}
-        </div>
-
-        {/* Floating Map Pill Button */}
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30">
-          <Link
-            href={cityFilter && cityFilter !== "All" ? `/map?city=${cityFilter}` : "/map"}
-            className="flex items-center gap-2 rounded-full bg-emerald-950/95 hover:bg-emerald-900 text-cream-50 px-5 py-2.5 text-xs font-bold shadow-xl shadow-emerald-950/30 border border-emerald-700/50 backdrop-blur-md transition-all hover:scale-105 active:scale-95 cursor-pointer"
-          >
-            <Map className="h-4 w-4 text-amber-300" />
-            <span>Показать на карте</span>
-          </Link>
         </div>
 
         {/* TTLock Digital Access Banner */}

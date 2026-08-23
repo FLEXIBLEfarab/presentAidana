@@ -1,4 +1,11 @@
-import type { CapacitorConfig } from "@capacitor/cli";
+export interface CapacitorConfig {
+  appId: string;
+  appName: string;
+  webDir: string;
+  server?: any;
+  ios?: any;
+  plugins?: any;
+}
 
 const config: CapacitorConfig = {
   appId: "kz.ayalymeken.app",
