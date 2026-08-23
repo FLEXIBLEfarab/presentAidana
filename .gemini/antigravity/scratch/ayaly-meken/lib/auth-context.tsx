@@ -35,6 +35,12 @@ export function validatePasswordSecurity(password: string): string | null {
   if (!/[A-Z]/.test(password)) {
     return "Пароль должен содержать хотя бы одну заглавную латинскую букву (A-Z).";
   }
+  if (!/[0-9]/.test(password)) {
+    return "Пароль должен содержать хотя бы одну цифру (0-9).";
+  }
+  if (!/[.,_\-!#@~]/.test(password)) {
+    return "Пароль должен содержать хотя бы один спецсимвол (. , _ - ! # @ ~).";
+  }
   if (!/^[A-Za-z0-9.,_\-!#@~]+$/.test(password)) {
     return "Пароль может содержать только латинские буквы, цифры и символы (. , _ - ! # @ ~).";
   }

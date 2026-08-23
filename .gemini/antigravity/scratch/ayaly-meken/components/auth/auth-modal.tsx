@@ -468,7 +468,7 @@ export function AuthModal() {
 
                 <div>
                   <label className="text-xs font-semibold text-stone-700 mb-1 block">
-                    Пароль (от 6 символов) *
+                    Пароль *
                   </label>
                   <div className="relative">
                     <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
@@ -488,6 +488,9 @@ export function AuthModal() {
                       {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                     </button>
                   </div>
+                  <p className="text-[10px] text-stone-400 mt-1">
+                    Минимум 6 знаков: заглавная буква (A-Z), цифра и спецсимвол (например: <strong>Aisulu_2026</strong>)
+                  </p>
                 </div>
 
                 {errorMessage && (
