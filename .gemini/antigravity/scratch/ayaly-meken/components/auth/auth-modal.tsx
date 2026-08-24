@@ -17,6 +17,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useGuestAuth } from "@/lib/auth-context";
+import { validateGuestAge } from "@/lib/utils";
 
 export function AuthModal() {
   const {
@@ -33,6 +34,7 @@ export function AuthModal() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("+7 ");
+  const [birthDate, setBirthDate] = useState("");
   const [city, setCity] = useState("Астана");
 
   const [showPassword, setShowPassword] = useState(false);
@@ -67,6 +69,15 @@ export function AuthModal() {
   const handleRegisterSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
+
+    if (birthDate) {
+      const ageRes = validateGuestAge({ birthDate });
+      if (!ageRes.isValid) {
+        setErrorMessage(ageRes.error || "Регистрация доступна только лицам от 16 лет");
+        return;
+      }
+    }
+
     setIsLoading(true);
 
     setTimeout(() => {
@@ -462,6 +473,25 @@ export function AuthModal() {
                       placeholder="+7 778 000 0000"
                       required
                       className="w-full h-10 pl-9 pr-3 rounded-2xl border border-sand-300 bg-sand-50/50 text-xs font-semibold text-emerald-950 outline-none focus:bg-white focus:border-emerald-700 transition-all"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs font-semibold text-stone-700 block">
+                      Дата рождения (16+) *
+                    </label>
+                    <span className="text-[10px] text-emerald-800 font-semibold">Доступ с 16 лет</span>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      value={birthDate}
+                      max="2010-12-31"
+                      required
+                      onChange={(e) => setBirthDate(e.target.value)}
+                      className="w-full h-10 px-3.5 rounded-2xl border border-sand-300 bg-sand-50/50 text-xs font-semibold text-emerald-950 outline-none focus:bg-white focus:border-emerald-700 transition-all"
                     />
                   </div>
                 </div>

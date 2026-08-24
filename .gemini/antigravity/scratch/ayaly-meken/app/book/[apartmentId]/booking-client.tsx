@@ -8,7 +8,14 @@ import {
   User, CheckCircle, Loader2, AlertCircle, MessageCircle, Send, Users
 } from "lucide-react";
 import { Apartment } from "@/types/database.types";
-import { calculateBookingPrice, formatKZT, formatDateRange, buildWhatsAppLink } from "@/lib/utils";
+import {
+  calculateBookingPrice,
+  formatKZT,
+  formatDateRange,
+  buildWhatsAppLink,
+  validateGuestAge,
+  getBirthDateFromIin,
+} from "@/lib/utils";
 import { BookingSummary } from "@/components/booking/booking-summary";
 import { KaspiQrModal } from "@/components/booking/kaspi-qr-modal";
 import { createBooking } from "@/actions/bookings";
@@ -30,6 +37,9 @@ export function BookingClient({ apartment, checkIn, checkOut, guests }: BookingC
   const [lastName, setLastName] = useState(user?.name ? user.name.split(" ").slice(1).join(" ") || "" : "");
   const [phone, setPhone] = useState(user?.phone || "+7 ");
   const [email, setEmail] = useState(user?.email || "");
+  const [birthDate, setBirthDate] = useState("");
+  const [iin, setIin] = useState("");
+  const [ageConfirmed, setAgeConfirmed] = useState(true);
   const [guestsCount, setGuestsCount] = useState(guests);
   const [notes, setNotes] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"kaspi_qr" | "kaspi_transfer" | "card_online" | "cash">("kaspi_qr");
@@ -43,10 +53,26 @@ export function BookingClient({ apartment, checkIn, checkOut, guests }: BookingC
     checkOut,
   });
 
+  const ageCheck = validateGuestAge({ birthDate, iin });
+
+  const handleIinChange = (val: string) => {
+    const clean = val.replace(/\D/g, "").slice(0, 12);
+    setIin(clean);
+    if (clean.length === 12) {
+      const parsedDob = getBirthDateFromIin(clean);
+      if (parsedDob && !birthDate) {
+        setBirthDate(parsedDob);
+      }
+    }
+  };
+
   const validate = () => {
     if (!firstName.trim()) return "Введите ваше имя";
     if (!lastName.trim()) return "Введите вашу фамилию";
     if (!phone.trim() || phone.replace(/\D/g, "").length < 11) return "Введите корректный номер телефона (+7...)";
+    if (!birthDate && !iin) return "Укажите дату рождения для подтверждения возраста (16+ лет)";
+    if (!ageCheck.isValid) return ageCheck.error || "Бронирование доступно только лицам от 16 лет";
+    if (!ageConfirmed) return "Пожалуйста, подтвердите, что вам исполнилось 16 лет";
     return null;
   };
 
@@ -180,6 +206,71 @@ export function BookingClient({ apartment, checkIn, checkOut, guests }: BookingC
               </div>
             </div>
 
+            {/* Age & Identity Verification (16+ Rule) */}
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50/40 p-3.5 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-950">
+                  <ShieldCheck className="h-4 w-4 text-emerald-700" />
+                  <span>Подтверждение возраста (16+)</span>
+                </div>
+                {ageCheck.isValid && (birthDate || iin) ? (
+                  <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <CheckCircle className="h-3.5 w-3.5 text-emerald-600" />
+                    {ageCheck.age ? `${ageCheck.age} лет (16+ подтверждено)` : "16+ подтверждено"}
+                  </span>
+                ) : !ageCheck.isValid ? (
+                  <span className="text-[11px] font-bold text-red-700 bg-red-100 px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <AlertCircle className="h-3.5 w-3.5 text-red-600" />
+                    Младше 16 лет
+                  </span>
+                ) : (
+                  <span className="text-[10px] text-stone-500 font-semibold">Бронирование доступно с 16 лет</span>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Birth Date */}
+                <div>
+                  <label className="block text-[11px] font-bold text-stone-700">
+                    Дата рождения <span className="text-red-500">*</span>
+                  </label>
+                  <div className="mt-1 flex items-center rounded-2xl border border-sand-300 bg-white px-3 py-2">
+                    <input
+                      type="date"
+                      required
+                      max="2010-12-31"
+                      value={birthDate}
+                      onChange={(e) => setBirthDate(e.target.value)}
+                      className="w-full bg-transparent text-xs font-semibold text-stone-900 outline-none"
+                    />
+                  </div>
+                </div>
+
+                {/* Kazakhstani IIN (Optional auto-calculator) */}
+                <div>
+                  <label className="block text-[11px] font-bold text-stone-700">
+                    ИИН / ЖСН РК (12 цифр)
+                  </label>
+                  <div className="mt-1 flex items-center rounded-2xl border border-sand-300 bg-white px-3 py-2">
+                    <input
+                      type="text"
+                      maxLength={12}
+                      placeholder="080512501234"
+                      value={iin}
+                      onChange={(e) => handleIinChange(e.target.value)}
+                      className="w-full bg-transparent text-xs font-semibold text-stone-900 outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {!ageCheck.isValid && (
+                <div className="text-[11px] font-bold text-red-700 bg-red-50 p-2.5 rounded-xl border border-red-200">
+                  {ageCheck.error}
+                </div>
+              )}
+            </div>
+
             {/* Notes */}
             <div>
               <label className="block text-xs font-bold text-stone-700">Особые пожелания / время прибытия</label>
@@ -263,6 +354,19 @@ export function BookingClient({ apartment, checkIn, checkOut, guests }: BookingC
             </p>
           </div>
 
+          {/* Age and Terms Confirmation Checkbox */}
+          <label className="flex items-start gap-2.5 cursor-pointer select-none rounded-2xl border border-sand-300 bg-white p-3.5 shadow-2xs hover:bg-sand-50/50 transition-all">
+            <input
+              type="checkbox"
+              checked={ageConfirmed}
+              onChange={(e) => setAgeConfirmed(e.target.checked)}
+              className="mt-0.5 h-4 w-4 rounded text-emerald-800 border-sand-400 focus:ring-emerald-800 shrink-0 cursor-pointer"
+            />
+            <span className="text-[11px] text-stone-700 leading-snug">
+              Мне исполнилось <strong>16 лет</strong>. Я подтверждаю достоверность данных и принимаю правила проживания и публичную оферту.
+            </span>
+          </label>
+
           {/* Error */}
           {errorMessage && (
             <div className="flex items-center gap-2 rounded-2xl bg-red-50 p-4 text-xs font-bold text-red-700 border border-red-200">
@@ -272,7 +376,7 @@ export function BookingClient({ apartment, checkIn, checkOut, guests }: BookingC
           )}
 
           {/* Submit */}
-          <button type="submit" disabled={isSubmitting} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-900 py-4 text-sm font-bold text-cream-50 shadow-md transition-all hover:bg-emerald-800 active:scale-98 disabled:opacity-70">
+          <button type="submit" disabled={isSubmitting || !ageCheck.isValid} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-900 py-4 text-sm font-bold text-cream-50 shadow-md transition-all hover:bg-emerald-800 active:scale-98 disabled:opacity-70 cursor-pointer">
             {isSubmitting ? (
               <><Loader2 className="h-4 w-4 animate-spin" /><span>Обработка бронирования...</span></>
             ) : (
