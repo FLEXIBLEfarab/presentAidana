@@ -6,12 +6,13 @@ import Link from "next/link";
 import {
   Star, MapPin, Sparkles, ShieldCheck, KeyRound, Wifi, CheckCircle2, Share2, Heart,
   ChevronLeft, Grid, Users, BedDouble, Bath, Maximize2, ChevronDown, ChevronUp,
-  Zap, Clock, Building2, Mountain
+  Zap, Clock, Building2, Mountain, Flag
 } from "lucide-react";
 import { Apartment, Review } from "@/types/database.types";
 import { BookingWidget } from "@/components/apartments/booking-widget";
 import { GalleryModal } from "@/components/apartments/gallery-modal";
 import { ReviewModal } from "@/components/reviews/review-modal";
+import { ReportApartmentModal } from "@/components/apartments/report-apartment-modal";
 import { cn } from "@/lib/utils";
 
 interface ApartmentDetailClientProps {
@@ -24,6 +25,7 @@ export function ApartmentDetailClient({ apartment, reviews }: ApartmentDetailCli
   const [isSaved, setIsSaved] = useState(false);
   const [isRulesOpen, setIsRulesOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
   const images = apartment.images && apartment.images.length > 0
     ? apartment.images
@@ -270,6 +272,18 @@ export function ApartmentDetailClient({ apartment, reviews }: ApartmentDetailCli
               ))}
             </div>
           </div>
+
+          {/* Report Apartment Listing Link */}
+          <div className="pt-2 flex justify-end">
+            <button
+              type="button"
+              onClick={() => setIsReportModalOpen(true)}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-stone-400 hover:text-red-600 transition-colors cursor-pointer"
+            >
+              <Flag size={13} />
+              <span>Пожаловаться на объявление</span>
+            </button>
+          </div>
         </div>
 
         {/* RIGHT: Sticky Booking Widget */}
@@ -284,6 +298,14 @@ export function ApartmentDetailClient({ apartment, reviews }: ApartmentDetailCli
       <ReviewModal
         isOpen={isReviewModalOpen}
         onClose={() => setIsReviewModalOpen(false)}
+        apartmentId={apartment.id}
+        apartmentName={apartment.name}
+      />
+
+      {/* Report Apartment Modal */}
+      <ReportApartmentModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
         apartmentId={apartment.id}
         apartmentName={apartment.name}
       />

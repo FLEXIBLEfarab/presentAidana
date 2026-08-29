@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { useGuestAuth } from "@/lib/auth-context";
 import { formatKZT } from "@/lib/utils";
+import { SupportChatModal } from "@/components/support/support-chat-modal";
 
 export function ProfileModal() {
   const {
@@ -51,6 +52,7 @@ export function ProfileModal() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [isSupportOpen, setIsSupportOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -214,20 +216,19 @@ export function ProfileModal() {
             </div>
           </Link>
 
-          <Link
-            href="https://wa.me/77001234567"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 p-3 rounded-2xl bg-sand-50 hover:bg-sand-100/90 border border-sand-200/80 transition-all group"
+          <button
+            type="button"
+            onClick={() => setIsSupportOpen(true)}
+            className="flex items-center gap-3 p-3 rounded-2xl bg-sand-50 hover:bg-sand-100/90 border border-sand-200/80 transition-all group cursor-pointer text-left"
           >
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-xs group-hover:scale-105 transition-transform shrink-0">
               <MessageCircle size={16} />
             </div>
             <div>
               <span className="font-bold text-xs text-emerald-950 block">Служба заботы</span>
-              <span className="text-[10px] text-stone-400">WhatsApp 24/7</span>
+              <span className="text-[10px] text-stone-400">Чат и помощь 24/7</span>
             </div>
-          </Link>
+          </button>
         </div>
 
         {/* PROMOCODE SECTION */}
@@ -434,6 +435,12 @@ export function ProfileModal() {
           </div>
         )}
       </div>
+
+      {/* Support Chat Modal */}
+      <SupportChatModal
+        isOpen={isSupportOpen}
+        onClose={() => setIsSupportOpen(false)}
+      />
     </div>
   );
 }

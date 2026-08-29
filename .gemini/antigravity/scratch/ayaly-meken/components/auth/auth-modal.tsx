@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useGuestAuth } from "@/lib/auth-context";
 import { validateGuestAge } from "@/lib/utils";
+import { TermsModal } from "@/components/legal/terms-modal";
 
 export function AuthModal() {
   const {
@@ -36,6 +37,9 @@ export function AuthModal() {
   const [phone, setPhone] = useState("+7 ");
   const [birthDate, setBirthDate] = useState("");
   const [city, setCity] = useState("Астана");
+
+  const [isTermsAccepted, setIsTermsAccepted] = useState(true);
+  const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -69,6 +73,11 @@ export function AuthModal() {
   const handleRegisterSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
+
+    if (!isTermsAccepted) {
+      setErrorMessage("Пожалуйста, подтвердите согласие с условиями использования");
+      return;
+    }
 
     if (birthDate) {
       const ageRes = validateGuestAge({ birthDate });
@@ -131,8 +140,8 @@ export function AuthModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-emerald-950/70 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="relative w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-sand-300 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-emerald-950/70 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="relative w-full max-w-md bg-white rounded-3xl p-5 sm:p-7 shadow-2xl border border-sand-300 max-h-[92vh] flex flex-col overflow-hidden">
         {/* Close Button */}
         <button
           type="button"
@@ -425,7 +434,7 @@ export function AuthModal() {
 
             {/* REGISTER FORM */}
             {tab === "register" && (
-              <form onSubmit={handleRegisterSubmit} className="space-y-3.5">
+              <form onSubmit={handleRegisterSubmit} className="space-y-3 overflow-y-auto pr-1">
                 <div>
                   <label className="text-xs font-semibold text-stone-700 mb-1 block">
                     Имя и фамилия *
@@ -523,6 +532,29 @@ export function AuthModal() {
                   </p>
                 </div>
 
+                {/* Terms of Service Checkbox */}
+                <div className="flex items-start gap-2 pt-1 text-left">
+                  <input
+                    type="checkbox"
+                    id="terms-agree"
+                    checked={isTermsAccepted}
+                    onChange={(e) => setIsTermsAccepted(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-sand-300 text-emerald-800 accent-emerald-800 focus:ring-emerald-700 cursor-pointer shrink-0"
+                    required
+                  />
+                  <label htmlFor="terms-agree" className="text-[11px] text-stone-600 leading-tight select-none cursor-pointer">
+                    Я согласен с{" "}
+                    <button
+                      type="button"
+                      onClick={() => setIsTermsModalOpen(true)}
+                      className="text-emerald-800 font-bold underline hover:text-emerald-950"
+                    >
+                      Условиями использования
+                    </button>{" "}
+                    и обработкой персональных данных
+                  </label>
+                </div>
+
                 {errorMessage && (
                   <div className="text-xs text-red-600 bg-red-50 p-2.5 rounded-xl border border-red-200 font-medium">
                     {errorMessage}
@@ -551,6 +583,12 @@ export function AuthModal() {
           </div>
         )}
       </div>
+
+      {/* Terms of Service & Privacy Modal */}
+      <TermsModal
+        isOpen={isTermsModalOpen}
+        onClose={() => setIsTermsModalOpen(false)}
+      />
     </div>
   );
 }
