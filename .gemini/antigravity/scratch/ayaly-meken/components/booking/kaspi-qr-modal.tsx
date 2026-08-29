@@ -9,6 +9,8 @@ interface KaspiQrModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  hostName?: string;
+  hostPhone?: string;
 }
 
 export function KaspiQrModal({
@@ -16,6 +18,8 @@ export function KaspiQrModal({
   isOpen,
   onClose,
   onSuccess,
+  hostName = "Аренда апартаментов (Altyn Qonaq Host)",
+  hostPhone = "+7 (777) 123-4567",
 }: KaspiQrModalProps) {
   const [timeLeft, setTimeLeft] = useState(300); // 5 minutes countdown
   const [isProcessing, setIsProcessing] = useState(false);
@@ -59,8 +63,8 @@ export function KaspiQrModal({
             K
           </div>
           <div>
-            <h3 className="text-base font-bold text-stone-900">Оплата Kaspi QR</h3>
-            <p className="text-xs text-stone-500">Отсканируйте в приложении Kaspi.kz</p>
+            <h3 className="text-base font-bold text-stone-900">Оплата Kaspi QR / Перевод</h3>
+            <p className="text-xs text-stone-500">Прямой перевод владельцу: <strong>{hostName}</strong></p>
           </div>
         </div>
 
@@ -73,7 +77,7 @@ export function KaspiQrModal({
             {formatKZT(amount)}
           </div>
           <div className="mt-1 text-[11px] font-medium text-emerald-700">
-            0% Комиссия · Мгновенная активация ПИН-кода двери
+            Прямой перевод на Kaspi: <strong>{hostPhone}</strong>
           </div>
         </div>
 

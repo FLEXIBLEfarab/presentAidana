@@ -393,7 +393,14 @@ export function BookingClient({ apartment, checkIn, checkOut, guests }: BookingC
         </div>
       </div>
 
-      <KaspiQrModal amount={priceInfo.total} isOpen={isKaspiModalOpen} onClose={() => setIsKaspiModalOpen(false)} onSuccess={finalizeBooking} />
+      <KaspiQrModal
+        amount={priceInfo.total}
+        isOpen={isKaspiModalOpen}
+        onClose={() => setIsKaspiModalOpen(false)}
+        onSuccess={finalizeBooking}
+        hostName={apartment.custom_kaspi_name || `Владелец «${apartment.name}»`}
+        hostPhone={apartment.custom_kaspi_phone || "+7 (777) 123-4567"}
+      />
     </div>
   );
 }

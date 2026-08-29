@@ -96,6 +96,12 @@ export interface Apartment {
   nearby_landmarks?: string[];
   property_type?: 'studio' | 'apartment' | 'penthouse' | 'villa';
   status: ApartmentStatus;
+  is_top_promoted?: boolean;
+  is_blocked_for_debt?: boolean;
+  commission_tier?: 'standard_10' | 'top_promo_20';
+  custom_kaspi_phone?: string;
+  custom_kaspi_name?: string;
+  custom_iban?: string;
   created_at: string;
 }
 

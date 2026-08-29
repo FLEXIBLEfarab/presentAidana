@@ -116,6 +116,9 @@ export function applyFiltersAndSort(
     );
   }
 
+  // Blocked for debt filter & status check
+  result = result.filter((a) => !a.is_blocked_for_debt && a.status !== "archived");
+
   // Sorting
   switch (filters.sortBy) {
     case "price_asc":
@@ -135,6 +138,13 @@ export function applyFiltersAndSort(
           (a.rating || 0) * Math.log((a.reviews_count || 1) + 1)
       );
   }
+
+  // TOP PROMO BOOST: Apartments with 20% commission tier / is_top_promoted are pinned to the top!
+  result.sort((a, b) => {
+    const aTop = a.is_top_promoted || a.commission_tier === "top_promo_20" ? 1 : 0;
+    const bTop = b.is_top_promoted || b.commission_tier === "top_promo_20" ? 1 : 0;
+    return bTop - aTop;
+  });
 
   return result;
 }

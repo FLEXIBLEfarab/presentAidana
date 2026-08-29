@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { Star, Heart, MapPin, ChevronLeft, ChevronRight, Sparkles, Users, BedDouble, ArrowUpRight } from "lucide-react";
+import { Star, Heart, MapPin, ChevronLeft, ChevronRight, Sparkles, Users, BedDouble, ArrowUpRight, Crown } from "lucide-react";
 import { Apartment } from "@/types/database.types";
 import { formatKZT, cn } from "@/lib/utils";
 
@@ -15,6 +15,8 @@ interface ApartmentCardProps {
 export function ApartmentCard({ apartment, isHighlighted }: ApartmentCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
+
+  const isTopPromoted = apartment.is_top_promoted || apartment.commission_tier === "top_promo_20";
 
   const images =
     apartment.images && apartment.images.length > 0
@@ -49,6 +51,8 @@ export function ApartmentCard({ apartment, isHighlighted }: ApartmentCardProps) 
         "group relative flex flex-col rounded-3xl bg-white p-3 border shadow-soft transition-all duration-300 hover:shadow-card hover:-translate-y-1",
         isHighlighted
           ? "border-emerald-800 ring-2 ring-emerald-800/20 shadow-float"
+          : isTopPromoted
+          ? "border-amber-400/80 ring-1 ring-amber-400/30 hover:border-amber-500 shadow-md"
           : "border-sand-200/90 hover:border-emerald-700/40"
       )}
     >
@@ -72,11 +76,18 @@ export function ApartmentCard({ apartment, isHighlighted }: ApartmentCardProps) 
           <Heart className={cn("h-4 w-4", isLiked ? "fill-rose-500 text-rose-500" : "text-white")} />
         </button>
 
-        {/* Brand Badge */}
-        <div className="absolute left-3 top-3 z-10 flex items-center gap-1.5 rounded-full bg-emerald-950/85 px-2.5 py-1 text-[10px] font-bold text-cream-50 shadow-md backdrop-blur-md border border-amber-400/30">
-          <Sparkles className="h-3 w-3 text-amber-300 fill-amber-300" />
-          <span>Ayaly Selection</span>
-        </div>
+        {/* Brand / TOP Badge */}
+        {isTopPromoted ? (
+          <div className="absolute left-3 top-3 z-10 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-3 py-1 text-[10px] font-black text-slate-950 shadow-md backdrop-blur-md border border-amber-300">
+            <Crown className="h-3.5 w-3.5 fill-slate-950 text-slate-950" />
+            <span>👑 ТОП ВЫБОР</span>
+          </div>
+        ) : (
+          <div className="absolute left-3 top-3 z-10 flex items-center gap-1.5 rounded-full bg-emerald-950/85 px-2.5 py-1 text-[10px] font-bold text-cream-50 shadow-md backdrop-blur-md border border-amber-400/30">
+            <Sparkles className="h-3 w-3 text-amber-300 fill-amber-300" />
+            <span>Ayaly Selection</span>
+          </div>
+        )}
 
         {/* Gallery Carousel Arrows */}
         {images.length > 1 && (
