@@ -133,9 +133,18 @@ export function ApartmentCard({ apartment, isHighlighted }: ApartmentCardProps) 
               <span className="truncate">{apartment.city}{apartment.district ? ` · ${apartment.district}` : ""}</span>
             </span>
             <div className="flex items-center gap-1 text-stone-900 font-bold shrink-0">
-              <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-              <span>{apartment.rating || "4.95"}</span>
-              <span className="text-stone-400 font-normal">({apartment.reviews_count || 32})</span>
+              {apartment.reviews_count && apartment.reviews_count > 0 && apartment.rating ? (
+                <>
+                  <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                  <span>{apartment.rating.toFixed(1)}</span>
+                  <span className="text-stone-400 font-normal">({apartment.reviews_count})</span>
+                </>
+              ) : (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-900 text-[10px] font-bold border border-amber-200">
+                  <Sparkles className="h-3 w-3 text-amber-500 fill-amber-500" />
+                  Новинка
+                </span>
+              )}
             </div>
           </div>
 

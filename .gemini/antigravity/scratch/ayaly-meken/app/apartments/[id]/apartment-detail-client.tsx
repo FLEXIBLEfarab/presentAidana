@@ -61,11 +61,18 @@ export function ApartmentDetailClient({ apartment, reviews }: ApartmentDetailCli
       <div className="pb-4">
         <h1 className="font-serif text-2xl font-bold sm:text-3xl lg:text-4xl text-stone-950">{apartment.name}</h1>
         <div className="mt-2 flex flex-wrap items-center gap-3 text-xs font-medium text-stone-600">
-          <div className="flex items-center gap-1 font-bold text-stone-900">
-            <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-            <span>{apartment.rating || "4.95"}</span>
-            <span className="text-stone-400">({apartment.reviews_count || reviews.length || 32} отзывов)</span>
-          </div>
+          {reviews.length > 0 ? (
+            <div className="flex items-center gap-1 font-bold text-stone-900">
+              <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+              <span>{(reviews.reduce((acc, r) => acc + (r.rating || 5), 0) / reviews.length).toFixed(1)}</span>
+              <span className="text-stone-400">({reviews.length} {reviews.length === 1 ? "отзыв" : reviews.length < 5 ? "отзыва" : "отзывов"})</span>
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-1.5 font-bold text-amber-900 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200 text-[11px]">
+              <Sparkles className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
+              <span>Новинка · 0 отзывов</span>
+            </div>
+          )}
           <span>·</span>
           <span className="flex items-center gap-1 text-emerald-800 font-semibold">
             <MapPin className="h-3.5 w-3.5 text-emerald-700" />
@@ -241,7 +248,9 @@ export function ApartmentDetailClient({ apartment, reviews }: ApartmentDetailCli
               <div className="flex items-center gap-2">
                 <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
                 <h3 className="font-serif text-lg font-bold text-stone-900">
-                  {apartment.rating || "4.95"} · {reviews.length || 3} отзыва гостей
+                  {reviews.length > 0
+                    ? `${(reviews.reduce((acc, r) => acc + (r.rating || 5), 0) / reviews.length).toFixed(1)} · ${reviews.length} ${reviews.length === 1 ? "отзыв" : reviews.length < 5 ? "отзыва" : "отзывов"} гостей`
+                    : "Отзывы гостей"}
                 </h3>
               </div>
               <button
@@ -253,24 +262,39 @@ export function ApartmentDetailClient({ apartment, reviews }: ApartmentDetailCli
                 <span>Написать отзыв</span>
               </button>
             </div>
-            <div className="mt-6 space-y-6">
-              {reviews.map((rev) => (
-                <div key={rev.id} className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-stone-900">
-                      {rev.author_name || rev.guest_name || "Гость"} {rev.author_city ? `· ${rev.author_city}` : ""}
-                    </span>
-                    <span className="text-[11px] text-stone-400">{rev.date || (rev.created_at ? new Date(rev.created_at).toLocaleDateString("ru-RU") : "Недавно")}</span>
+
+            {reviews.length > 0 ? (
+              <div className="mt-6 space-y-6">
+                {reviews.map((rev) => (
+                  <div key={rev.id} className="space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-stone-900">
+                        {rev.author_name || rev.guest_name || "Гость"} {rev.author_city ? `· ${rev.author_city}` : ""}
+                      </span>
+                      <span className="text-[11px] text-stone-400">{rev.date || (rev.created_at ? new Date(rev.created_at).toLocaleDateString("ru-RU") : "Недавно")}</span>
+                    </div>
+                    <div className="flex items-center gap-0.5">
+                      {Array.from({ length: rev.rating || 5 }).map((_, i) => (
+                        <Star key={i} className="h-3 w-3 fill-amber-400 text-amber-400" />
+                      ))}
+                    </div>
+                    <p className="text-xs text-stone-600 leading-relaxed">"{rev.comment}"</p>
                   </div>
-                  <div className="flex items-center gap-0.5">
-                    {Array.from({ length: rev.rating || 5 }).map((_, i) => (
-                      <Star key={i} className="h-3 w-3 fill-amber-400 text-amber-400" />
-                    ))}
-                  </div>
-                  <p className="text-xs text-stone-600 leading-relaxed">"{rev.comment}"</p>
+                ))}
+              </div>
+            ) : (
+              <div className="mt-6 py-6 text-center space-y-3">
+                <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center mx-auto border border-amber-200">
+                  <Sparkles size={22} />
                 </div>
-              ))}
-            </div>
+                <div className="space-y-1">
+                  <h4 className="font-bold text-sm text-stone-900">У этой квартиры пока нет отзывов</h4>
+                  <p className="text-xs text-stone-500 max-w-sm mx-auto leading-relaxed">
+                    Это новое жилье на платформе. Вы можете стать первым гостем, кто остановится здесь и поделится своими впечатлениями!
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Report Apartment Listing Link */}

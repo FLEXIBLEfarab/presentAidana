@@ -106,8 +106,8 @@ function enrichApartment(apt: any): Apartment {
       ],
     nearby_landmarks:
       apt.nearby_landmarks || match?.nearby_landmarks || ["Центральный парк", "ТРЦ", "Кофейни"],
-    rating: apt.rating || match?.rating || 4.95,
-    reviews_count: apt.reviews_count || match?.reviews_count || 38,
+    rating: apt.rating !== undefined && apt.rating !== null ? apt.rating : (match?.rating || 0),
+    reviews_count: apt.reviews_count !== undefined && apt.reviews_count !== null ? apt.reviews_count : (match?.reviews_count || 0),
     lat: coords.lat,
     lng: coords.lng,
     wifi_name: apt.wifi_name || match?.wifi_name || "AyalyMeken_Guest",
