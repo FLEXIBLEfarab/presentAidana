@@ -6,7 +6,8 @@ import Link from "next/link";
 import {
   Star, MapPin, Sparkles, ShieldCheck, KeyRound, Wifi, CheckCircle2, Share2, Heart,
   ChevronLeft, Grid, Users, BedDouble, Bath, Maximize2, ChevronDown, ChevronUp,
-  Zap, Clock, Building2, Mountain, Flag
+  Zap, Clock, Building2, Mountain, Flag, Wind, Tv, WashingMachine, UtensilsCrossed,
+  Car, Coffee, Flame, HelpCircle, Camera, ImageOff
 } from "lucide-react";
 import { Apartment, Review } from "@/types/database.types";
 import { BookingWidget } from "@/components/apartments/booking-widget";
@@ -14,6 +15,31 @@ import { GalleryModal } from "@/components/apartments/gallery-modal";
 import { ReviewModal } from "@/components/reviews/review-modal";
 import { ReportApartmentModal } from "@/components/apartments/report-apartment-modal";
 import { cn } from "@/lib/utils";
+
+const AMENITY_LABELS: Record<string, { label: string; icon?: any }> = {
+  wifi: { label: "Высокоскоростной Wi-Fi", icon: Wifi },
+  ac: { label: "Кондиционер", icon: Wind },
+  tv: { label: "Smart TV / Кабельное ТВ", icon: Tv },
+  washer: { label: "Стиральная машина", icon: WashingMachine },
+  dishwasher: { label: "Посудомоечная машина", icon: UtensilsCrossed },
+  parking: { label: "Парковочное место", icon: Car },
+  coffee: { label: "Кофемашина / Чайник", icon: Coffee },
+  balcony: { label: "Балкон / Панорамный вид", icon: Flame },
+  kitchen: { label: "Оборудованная кухня и посуда", icon: UtensilsCrossed },
+  fridge: { label: "Холодильник", icon: CheckCircle2 },
+  iron: { label: "Утюг и гладильная доска", icon: CheckCircle2 },
+  hairdryer: { label: "Фен для волос", icon: CheckCircle2 },
+  lock: { label: "Бесконтактный умный замок (TTLock)", icon: KeyRound },
+  ttlock: { label: "Бесконтактный умный замок (TTLock)", icon: KeyRound },
+};
+
+function formatAmenity(raw: string) {
+  const key = raw.toLowerCase().trim();
+  if (AMENITY_LABELS[key]) {
+    return AMENITY_LABELS[key];
+  }
+  return { label: raw, icon: CheckCircle2 };
+}
 
 interface ApartmentDetailClientProps {
   apartment: Apartment;
@@ -29,7 +55,11 @@ export function ApartmentDetailClient({ apartment, reviews }: ApartmentDetailCli
 
   const images = apartment.images && apartment.images.length > 0
     ? apartment.images
-    : [apartment.cover_image || "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1200&auto=format&fit=crop"];
+    : (apartment.cover_image ? [apartment.cover_image] : []);
+
+  const amenities = apartment.amenities && apartment.amenities.length > 0 ? apartment.amenities : [];
+  const landmarks = apartment.nearby_landmarks && apartment.nearby_landmarks.length > 0 ? apartment.nearby_landmarks : [];
+  const houseRules = apartment.house_rules && apartment.house_rules.length > 0 ? apartment.house_rules : [];
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -42,14 +72,14 @@ export function ApartmentDetailClient({ apartment, reviews }: ApartmentDetailCli
         <div className="flex items-center gap-3">
           <button
             onClick={() => { if (navigator.share) navigator.share({ title: apartment.name, url: window.location.href }); }}
-            className="flex items-center gap-1.5 rounded-full border border-sand-300 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700 hover:bg-sand-100"
+            className="flex items-center gap-1.5 rounded-full border border-sand-300 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700 hover:bg-sand-100 cursor-pointer"
           >
             <Share2 className="h-3.5 w-3.5" />
             <span>Поделиться</span>
           </button>
           <button
             onClick={() => setIsSaved(!isSaved)}
-            className="flex items-center gap-1.5 rounded-full border border-sand-300 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700 hover:bg-sand-100"
+            className="flex items-center gap-1.5 rounded-full border border-sand-300 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700 hover:bg-sand-100 cursor-pointer"
           >
             <Heart className={cn("h-3.5 w-3.5", isSaved ? "fill-rose-500 text-rose-500" : "")} />
             <span>{isSaved ? "Сохранено" : "Сохранить"}</span>
@@ -84,57 +114,68 @@ export function ApartmentDetailClient({ apartment, reviews }: ApartmentDetailCli
         <div className="mt-3 flex flex-wrap gap-2">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-bold text-emerald-900">
             <Zap className="h-3 w-3 text-amber-500 fill-amber-500" />
-            Мгновенное подтверждение
+            Мгновенное бронирование
           </span>
           <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-[11px] font-bold text-emerald-800">
             <KeyRound className="h-3 w-3" />
-            Самостоятельный заезд 24/7
+            Бесконтактный заезд по ПИН-коду
           </span>
           <span className="inline-flex items-center gap-1.5 rounded-full bg-sand-100 border border-sand-300 px-3 py-1 text-[11px] font-bold text-stone-700">
             <ShieldCheck className="h-3 w-3 text-emerald-700" />
-            Проверено Altyn Qonaq
+            Платформа Altyn Qonaq & Ayaly Meken
           </span>
         </div>
       </div>
 
-      {/* Photo 5-Grid Collage */}
-      <div className="relative mt-2 overflow-hidden rounded-3xl">
-        <div className="grid grid-cols-4 grid-rows-2 gap-1.5 h-[380px] sm:h-[440px]">
-          {/* Main Large */}
-          <div onClick={() => setIsGalleryOpen(true)} className="col-span-2 row-span-2 relative cursor-pointer overflow-hidden bg-sand-200 rounded-l-3xl">
-            <Image src={images[0]} alt={apartment.name} fill priority className="object-cover hover:scale-105 transition-transform duration-500" />
-          </div>
-          {/* Side 4 */}
-          {images.slice(1, 5).map((img, idx) => (
-            <div key={idx} onClick={() => setIsGalleryOpen(true)} className={cn("relative cursor-pointer overflow-hidden bg-sand-200", idx === 1 && "rounded-tr-3xl", idx === 3 && "rounded-br-3xl")}>
-              <Image src={img} alt={`${apartment.name} ${idx + 2}`} fill className="object-cover hover:scale-105 transition-transform duration-300" />
+      {/* Photo Showcase */}
+      {images.length > 0 ? (
+        <div className="relative mt-2 overflow-hidden rounded-3xl">
+          {images.length >= 3 ? (
+            <div className="grid grid-cols-4 grid-rows-2 gap-1.5 h-[360px] sm:h-[440px]">
+              <div onClick={() => setIsGalleryOpen(true)} className="col-span-2 row-span-2 relative cursor-pointer overflow-hidden bg-sand-200 rounded-l-3xl">
+                <Image src={images[0]} alt={apartment.name} fill priority className="object-cover hover:scale-105 transition-transform duration-500" />
+              </div>
+              {images.slice(1, 5).map((img, idx) => (
+                <div key={idx} onClick={() => setIsGalleryOpen(true)} className={cn("relative cursor-pointer overflow-hidden bg-sand-200", idx === 1 && "rounded-tr-3xl", idx === 3 && "rounded-br-3xl")}>
+                  <Image src={img} alt={`${apartment.name} ${idx + 2}`} fill className="object-cover hover:scale-105 transition-transform duration-300" />
+                </div>
+              ))}
             </div>
-          ))}
+          ) : (
+            <div onClick={() => setIsGalleryOpen(true)} className="relative h-[320px] sm:h-[420px] w-full rounded-3xl overflow-hidden cursor-pointer bg-sand-200">
+              <Image src={images[0]} alt={apartment.name} fill priority className="object-cover hover:scale-102 transition-transform duration-500" />
+            </div>
+          )}
+
+          <button
+            onClick={() => setIsGalleryOpen(true)}
+            className="absolute bottom-4 right-4 flex items-center gap-2 rounded-2xl bg-white/95 px-4 py-2 text-xs font-bold text-stone-900 shadow-md backdrop-blur-md hover:bg-white active:scale-95 cursor-pointer"
+          >
+            <Grid className="h-4 w-4" />
+            <span>Показать все фото ({images.length})</span>
+          </button>
         </div>
+      ) : (
+        <div className="mt-2 h-64 rounded-3xl border-2 border-dashed border-sand-300 bg-sand-100/60 flex flex-col items-center justify-center text-stone-400 gap-2 p-6 text-center">
+          <Camera size={36} className="text-stone-300" />
+          <p className="text-sm font-bold text-stone-600">Фотографии скоро будут загружены владельцем</p>
+          <p className="text-xs text-stone-400 max-w-sm">
+            Апартаменты добавлены в систему. Вы можете связаться с хозяином или поддержкой для уточнения деталей.
+          </p>
+        </div>
+      )}
 
-        {/* Show All Button */}
-        <button
-          onClick={() => setIsGalleryOpen(true)}
-          className="absolute bottom-4 right-4 flex items-center gap-2 rounded-2xl bg-white/95 px-4 py-2 text-xs font-bold text-stone-900 shadow-md backdrop-blur-md hover:bg-white active:scale-95"
-        >
-          <Grid className="h-4 w-4" />
-          <span>Показать все фото ({images.length})</span>
-        </button>
-      </div>
-
-      <GalleryModal images={images} apartmentName={apartment.name} isOpen={isGalleryOpen} onClose={() => setIsGalleryOpen(false)} />
-
-      {/* Details + Booking Grid */}
-      <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-3">
+      {/* Main Grid: Left Details (2 cols) | Right Sticky Booking Widget (1 col) */}
+      <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* LEFT: Details */}
         <div className="lg:col-span-2 space-y-8">
           {/* Quick Specs */}
           <div className="flex flex-wrap gap-6 rounded-3xl border border-sand-300 bg-white p-5 shadow-soft">
             {[
               { icon: Users, label: `${apartment.max_guests || 2} гостей`, sub: "Вместимость" },
-              { icon: BedDouble, label: `${apartment.bedrooms || 1} спальня`, sub: `${apartment.beds || 2} кровати` },
-              { icon: Bath, label: `${apartment.bathrooms || 1} ванная`, sub: "Полный санузел" },
-              { icon: Maximize2, label: `${apartment.area_sqm || 55} м²`, sub: `Этаж ${apartment.floor || 5}` },
+              { icon: BedDouble, label: `${apartment.bedrooms || apartment.rooms_count || 1} комн.`, sub: "Планировка" },
+              { icon: Bath, label: `${apartment.bathrooms || 1} санузел`, sub: "Полный санузел" },
+              { icon: Maximize2, label: `${apartment.area_sqm || 45} м²`, sub: apartment.floor ? `Этаж ${apartment.floor}` : "Площадь" },
             ].map(({ icon: Icon, label, sub }) => (
               <div key={label} className="flex items-center gap-2.5 text-xs text-stone-700">
                 <Icon className="h-5 w-5 text-emerald-800" />
@@ -146,55 +187,47 @@ export function ApartmentDetailClient({ apartment, reviews }: ApartmentDetailCli
             ))}
           </div>
 
-          {/* Stay Highlights */}
-          <div className="space-y-4 rounded-3xl border border-sand-300 bg-white p-6 shadow-soft">
-            <h3 className="font-serif text-lg font-bold text-stone-900">Преимущества этого жилья</h3>
-            <div className="space-y-4">
-              {[
-                { icon: KeyRound, title: "Самостоятельный заезд с цифровым кодом", body: "Заезжайте в любое время после 14:00 по вашему ПИН-коду." },
-                { icon: Wifi, title: "Быстрый выделенный Wi-Fi", body: "Протестированный интернет 500+ Мбит/с, идеален для удалённой работы." },
-                { icon: ShieldCheck, title: "Гостиничный стандарт чистоты", body: "Профессиональная уборка перед каждым заездом с отчётом." },
-              ].map(({ icon: Icon, title, body }) => (
-                <div key={title} className="flex items-start gap-3">
-                  <div className="rounded-xl bg-emerald-100 p-2 text-emerald-900 shrink-0"><Icon className="h-5 w-5" /></div>
-                  <div>
-                    <h4 className="text-xs font-bold text-stone-900">{title}</h4>
-                    <p className="text-xs text-stone-500 mt-0.5">{body}</p>
-                  </div>
-                </div>
-              ))}
+          {/* Description (Only if filled by owner) */}
+          {apartment.description && (
+            <div className="rounded-3xl border border-sand-300 bg-white p-6 shadow-soft">
+              <h3 className="font-serif text-lg font-bold text-stone-900">Об этом жилье</h3>
+              <p className="mt-3 text-xs sm:text-sm text-stone-700 leading-relaxed whitespace-pre-line">
+                {apartment.description}
+              </p>
             </div>
-          </div>
+          )}
 
-          {/* Description */}
-          <div className="rounded-3xl border border-sand-300 bg-white p-6 shadow-soft">
-            <h3 className="font-serif text-lg font-bold text-stone-900">Об этом жилье</h3>
-            <p className="mt-3 text-xs sm:text-sm text-stone-700 leading-relaxed whitespace-pre-line">
-              {apartment.description || "Добро пожаловать в уютные апартаменты высокого класса."}
-            </p>
-          </div>
-
-          {/* Amenities */}
-          <div className="rounded-3xl border border-sand-300 bg-white p-6 shadow-soft">
-            <h3 className="font-serif text-lg font-bold text-stone-900">Что есть в этом жилье</h3>
-            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {(apartment.amenities || ["Бесконтактный заезд (TTLock)", "Wi-Fi высокоскоростной", "Кондиционер", "Стиральная машина", "Кухня", "Кофемашина"]).map((amenity, i) => (
-                <div key={i} className="flex items-center gap-2.5 text-xs text-stone-700">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-700 shrink-0" />
-                  <span>{amenity}</span>
-                </div>
-              ))}
+          {/* Amenities (Only real items from owner) */}
+          {amenities.length > 0 && (
+            <div className="rounded-3xl border border-sand-300 bg-white p-6 shadow-soft">
+              <h3 className="font-serif text-lg font-bold text-stone-900">Что есть в этом жилье</h3>
+              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {amenities.map((item, i) => {
+                  const formatted = formatAmenity(item);
+                  const Icon = formatted.icon || CheckCircle2;
+                  return (
+                    <div key={i} className="flex items-center gap-2.5 text-xs text-stone-800 font-medium">
+                      <div className="w-7 h-7 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center shrink-0 border border-emerald-200/50">
+                        <Icon className="h-3.5 w-3.5" />
+                      </div>
+                      <span>{formatted.label}</span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Nearby Landmarks */}
-          {apartment.nearby_landmarks && apartment.nearby_landmarks.length > 0 && (
+          {/* Nearby Landmarks (Only if filled by owner) */}
+          {landmarks.length > 0 && (
             <div className="rounded-3xl border border-sand-300 bg-white p-6 shadow-soft">
               <h3 className="font-serif text-lg font-bold text-stone-900">Рядом с апартаментами</h3>
-              <div className="mt-3 space-y-2">
-                {apartment.nearby_landmarks.map((lm, i) => (
-                  <div key={i} className="flex items-center gap-2 text-xs text-stone-600">
-                    <MapPin className="h-3.5 w-3.5 text-emerald-700 shrink-0" />
+              <div className="mt-4 space-y-2.5">
+                {landmarks.map((lm, i) => (
+                  <div key={i} className="flex items-center gap-2.5 text-xs text-stone-700 font-semibold">
+                    <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+                      <MapPin className="h-3.5 w-3.5" />
+                    </div>
                     <span>{lm}</span>
                   </div>
                 ))}
@@ -202,45 +235,26 @@ export function ApartmentDetailClient({ apartment, reviews }: ApartmentDetailCli
             </div>
           )}
 
-          {/* House Rules Accordion */}
-          <div className="rounded-3xl border border-sand-300 bg-white shadow-soft overflow-hidden">
-            <button
-              onClick={() => setIsRulesOpen(!isRulesOpen)}
-              className="flex w-full items-center justify-between px-6 py-5 text-left"
-            >
-              <h3 className="font-serif text-lg font-bold text-stone-900">Правила дома</h3>
-              {isRulesOpen ? <ChevronUp className="h-5 w-5 text-stone-500" /> : <ChevronDown className="h-5 w-5 text-stone-500" />}
-            </button>
-
-            {isRulesOpen && (
-              <div className="px-6 pb-6 space-y-4 border-t border-sand-200 pt-4 animate-in fade-in duration-150">
-                <div className="grid grid-cols-2 gap-4 text-xs">
-                  <div className="rounded-2xl bg-cream-50 p-3">
-                    <span className="font-bold text-emerald-900">Заезд</span>
-                    <p className="text-stone-700 mt-0.5">После {apartment.check_in_time || "14:00"}</p>
-                  </div>
-                  <div className="rounded-2xl bg-cream-50 p-3">
-                    <span className="font-bold text-emerald-900">Выезд</span>
-                    <p className="text-stone-700 mt-0.5">До {apartment.check_out_time || "12:00"}</p>
-                  </div>
-                  <div className="rounded-2xl bg-cream-50 p-3 col-span-2">
-                    <span className="font-bold text-emerald-900 flex items-center gap-1">
-                      <Clock className="h-3.5 w-3.5" />
-                      Тихий час
-                    </span>
-                    <p className="text-stone-700 mt-0.5">С 23:00 до 08:00</p>
-                  </div>
-                </div>
-                <ul className="space-y-1.5 text-xs text-stone-600 list-disc list-inside">
-                  {(apartment.house_rules || [
-                    "Курение строго запрещено в помещении (штраф 25 000 ₸)",
-                    "Без вечеринок и шумных мероприятий",
-                    "Паспорт обязателен для регистрации"
-                  ]).map((rule, i) => <li key={i}>{rule}</li>)}
+          {/* House Rules (Only if filled by owner) */}
+          {houseRules.length > 0 && (
+            <div className="rounded-3xl border border-sand-300 bg-white p-6 shadow-soft">
+              <button
+                type="button"
+                onClick={() => setIsRulesOpen(!isRulesOpen)}
+                className="flex w-full items-center justify-between font-serif text-lg font-bold text-stone-900 cursor-pointer text-left"
+              >
+                <span>Правила дома</span>
+                {isRulesOpen ? <ChevronUp className="h-5 w-5 text-stone-400" /> : <ChevronDown className="h-5 w-5 text-stone-400" />}
+              </button>
+              {isRulesOpen && (
+                <ul className="mt-4 space-y-2 text-xs text-stone-600 list-disc pl-5">
+                  {houseRules.map((rule, i) => (
+                    <li key={i}>{rule}</li>
+                  ))}
                 </ul>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
 
           {/* Reviews */}
           <div className="rounded-3xl border border-sand-300 bg-white p-6 shadow-soft">
@@ -317,6 +331,16 @@ export function ApartmentDetailClient({ apartment, reviews }: ApartmentDetailCli
           </div>
         </div>
       </div>
+
+      {/* Gallery Modal */}
+      {images.length > 0 && (
+        <GalleryModal
+          isOpen={isGalleryOpen}
+          onClose={() => setIsGalleryOpen(false)}
+          images={images}
+          apartmentName={apartment.name}
+        />
+      )}
 
       {/* Review Modal */}
       <ReviewModal

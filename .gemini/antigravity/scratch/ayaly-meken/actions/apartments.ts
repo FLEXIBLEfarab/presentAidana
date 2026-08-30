@@ -65,54 +65,27 @@ function getCoordinatesForApartment(apt: any): { lat: number; lng: number } {
 }
 
 function enrichApartment(apt: any): Apartment {
-  const match = MOCK_APARTMENTS.find((m) => m.id === apt.id);
   const coords = getCoordinatesForApartment(apt);
+
+  const images = (apt.images && apt.images.length > 0)
+    ? apt.images
+    : (apt.cover_image ? [apt.cover_image] : []);
 
   return {
     ...apt,
-    cover_image:
-      apt.cover_image ||
-      match?.cover_image ||
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1200&auto=format&fit=crop",
-    images:
-      apt.images && apt.images.length > 0
-        ? apt.images
-        : match?.images || [
-            apt.cover_image ||
-              "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1200&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=1200&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=1200&auto=format&fit=crop",
-          ],
-    amenities:
-      apt.amenities && apt.amenities.length > 0
-        ? apt.amenities
-        : match?.amenities || [
-            "Бесконтактный заезд (TTLock)",
-            "Wi-Fi 500 Mbps",
-            "Кондиционер",
-            "Smart TV",
-            "Стиральная машина",
-          ],
-    description:
-      apt.description ||
-      match?.description ||
-      `Превосходные апартаменты «${apt.name}» с бесконтактным заселением по электронному замку TTLock, современным ремонтом и полным набором удобств.`,
-    house_rules:
-      apt.house_rules ||
-      match?.house_rules || [
-        "Курение строго запрещено (штраф 25 000 ₸)",
-        "Тихий час с 23:00 до 08:00",
-        "Без вечеринок и шумных компаний",
-      ],
-    nearby_landmarks:
-      apt.nearby_landmarks || match?.nearby_landmarks || ["Центральный парк", "ТРЦ", "Кофейни"],
-    rating: apt.rating !== undefined && apt.rating !== null ? apt.rating : (match?.rating || 0),
-    reviews_count: apt.reviews_count !== undefined && apt.reviews_count !== null ? apt.reviews_count : (match?.reviews_count || 0),
+    cover_image: apt.cover_image || (images.length > 0 ? images[0] : ""),
+    images,
+    amenities: apt.amenities || [],
+    description: apt.description || "",
+    house_rules: apt.house_rules || [],
+    nearby_landmarks: apt.nearby_landmarks || [],
+    rating: apt.rating !== undefined && apt.rating !== null ? apt.rating : 0,
+    reviews_count: apt.reviews_count !== undefined && apt.reviews_count !== null ? apt.reviews_count : 0,
     lat: coords.lat,
     lng: coords.lng,
-    wifi_name: apt.wifi_name || match?.wifi_name || "AyalyMeken_Guest",
-    wifi_password: apt.wifi_password || match?.wifi_password || "AltynGuest2026",
-    intercom_code: apt.intercom_code || match?.intercom_code || "101K",
+    wifi_name: apt.wifi_name || "",
+    wifi_password: apt.wifi_password || "",
+    intercom_code: apt.intercom_code || "",
   };
 }
 
