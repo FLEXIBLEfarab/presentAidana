@@ -252,6 +252,26 @@ export function BookingPassClient({ booking }: BookingPassClientProps) {
         </div>
       </div>
 
+      {/* Review Banner if stay ended */}
+      {(isCheckedOut || new Date(booking.check_out_date).getTime() <= Date.now()) && (
+        <div className="mt-6 rounded-3xl bg-gradient-to-r from-amber-50 to-amber-100/80 border border-amber-300/80 p-5 shadow-soft flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="space-y-1 text-center sm:text-left">
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-900">
+              <Star className="h-4 w-4 fill-amber-500 text-amber-500" />
+              <span>Поделитесь вашими впечатлениями</span>
+            </div>
+            <p className="text-xs text-stone-600">Ваш отзыв поможет улучшить сервис и пригодится будущим гостям.</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsReviewModalOpen(true)}
+            className="px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold shadow-md transition-all cursor-pointer shrink-0"
+          >
+            Написать отзыв ⭐
+          </button>
+        </div>
+      )}
+
       {/* Concierge Link Banner */}
       <div className="mt-6 rounded-3xl bg-white border border-sand-300 p-6 shadow-soft flex flex-col sm:flex-row items-center justify-between gap-4">
         <div>

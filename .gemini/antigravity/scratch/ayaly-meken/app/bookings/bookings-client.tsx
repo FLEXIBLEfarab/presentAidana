@@ -204,15 +204,26 @@ export function BookingsClient({ initialBookings }: { initialBookings: Booking[]
                           {formatKZT(booking.total_price)}
                         </span>
 
-                        {/* Review button */}
-                        <button
-                          type="button"
-                          onClick={() => setReviewBooking(booking)}
-                          className="flex items-center gap-1.5 rounded-2xl border border-amber-400 bg-amber-50/80 px-3 py-2 text-xs font-bold text-amber-900 hover:bg-amber-100 transition-all cursor-pointer"
-                        >
-                          <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
-                          <span>Отзыв</span>
-                        </button>
+                        {/* Review button - active only after checkout */}
+                        {booking.status === "checked_out" || new Date(booking.check_out_date).getTime() <= Date.now() ? (
+                          <button
+                            type="button"
+                            onClick={() => setReviewBooking(booking)}
+                            className="flex items-center gap-1.5 rounded-2xl border border-amber-400 bg-amber-50/80 px-3 py-2 text-xs font-bold text-amber-900 hover:bg-amber-100 transition-all cursor-pointer shadow-2xs"
+                          >
+                            <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
+                            <span>Оставить отзыв</span>
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setReviewBooking(booking)}
+                            className="flex items-center gap-1.5 rounded-2xl border border-sand-200 bg-sand-50 px-2.5 py-1.5 text-[11px] font-semibold text-stone-500 hover:text-stone-800 transition-all cursor-pointer"
+                          >
+                            <Clock className="h-3 w-3 text-stone-400" />
+                            <span>Отзыв после выезда</span>
+                          </button>
+                        )}
 
                         <Link
                           href={`/guest/${booking.id}`}
