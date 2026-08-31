@@ -17,10 +17,12 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useGuestAuth } from "@/lib/auth-context";
+import { useI18n } from "@/lib/i18n/context";
 import { validateGuestAge } from "@/lib/utils";
 import { TermsModal } from "@/components/legal/terms-modal";
 
 export function AuthModal() {
+  const { t } = useI18n();
   const {
     isAuthModalOpen,
     closeAuthModal,
@@ -162,15 +164,15 @@ export function AuthModal() {
           </div>
           <h2 className="font-serif text-2xl font-bold text-emerald-950">
             {isForgotMode
-              ? "Восстановление пароля"
+              ? t.auth.forgot_title
               : tab === "login"
-              ? "Вход в Ayaly Meken"
-              : "Регистрация гостя"}
+              ? t.auth.login_title
+              : t.auth.register_title}
           </h2>
           <p className="text-xs text-stone-500 max-w-xs mx-auto">
             {isForgotMode
-              ? "Сбросьте пароль для доступа к вашим бронированиям"
-              : "Единый гостевой портал: ключи TTLock, бронирования и консьерж-сервис"}
+              ? t.auth.forgot_subtitle
+              : t.auth.portal_subtitle}
           </p>
         </div>
 
@@ -211,14 +213,14 @@ export function AuthModal() {
                     }}
                     className="flex-1 h-11 rounded-2xl border border-sand-300 text-stone-700 text-xs font-bold hover:bg-sand-50 transition-all"
                   >
-                    Назад
+                    {t.auth.back_btn}
                   </button>
                   <button
                     type="submit"
                     disabled={isLoading}
                     className="flex-1 h-11 rounded-2xl bg-emerald-950 hover:bg-emerald-900 text-cream-50 text-xs font-bold shadow-md flex items-center justify-center gap-1.5 transition-all"
                   >
-                    {isLoading ? <Loader2 size={15} className="animate-spin text-amber-300" /> : "Получить код"}
+                    {isLoading ? <Loader2 size={15} className="animate-spin text-amber-300" /> : t.auth.get_code_btn}
                   </button>
                 </div>
               </form>
@@ -281,7 +283,7 @@ export function AuthModal() {
                     onClick={() => setForgotStep("request")}
                     className="flex-1 h-11 rounded-2xl border border-sand-300 text-stone-700 text-xs font-bold hover:bg-sand-50 transition-all"
                   >
-                    Назад
+                    {t.auth.back_btn}
                   </button>
                   <button
                     type="submit"
@@ -383,7 +385,7 @@ export function AuthModal() {
                       }}
                       className="text-[11px] font-semibold text-emerald-800 hover:underline"
                     >
-                      Забыли пароль?
+                      {t.auth.forgot_link}
                     </button>
                   </div>
                   <div className="relative">

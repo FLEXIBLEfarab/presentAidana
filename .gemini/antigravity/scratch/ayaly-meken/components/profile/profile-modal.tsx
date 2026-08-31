@@ -27,10 +27,12 @@ import {
   Tag,
 } from "lucide-react";
 import { useGuestAuth } from "@/lib/auth-context";
+import { useI18n } from "@/lib/i18n/context";
 import { formatKZT } from "@/lib/utils";
 import { SupportChatModal } from "@/components/support/support-chat-modal";
 
 export function ProfileModal() {
+  const { t } = useI18n();
   const {
     user,
     isProfileModalOpen,
@@ -75,23 +77,23 @@ export function ProfileModal() {
           <button
             type="button"
             onClick={closeProfileModal}
-            className="absolute right-4 top-4 p-2 rounded-full text-stone-400 hover:text-stone-700"
+            className="absolute right-4 top-4 p-2 rounded-full text-stone-400 hover:text-stone-700 cursor-pointer"
           >
             <X size={18} />
           </button>
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-900 text-cream-50 mb-3">
             <User className="w-7 h-7 text-amber-300" />
           </div>
-          <h2 className="font-serif text-xl font-bold text-emerald-950">Вы не авторизованы</h2>
+          <h2 className="font-serif text-xl font-bold text-emerald-950">{t.profile.not_auth_title}</h2>
           <p className="text-xs text-stone-500 mt-1 mb-5">
-            Войдите в аккаунт, чтобы просматривать свои поездки и управлять профилем.
+            {t.profile.not_auth_sub}
           </p>
           <button
             type="button"
             onClick={openAuthModal}
             className="w-full h-11 rounded-2xl bg-emerald-900 hover:bg-emerald-800 text-cream-50 text-xs font-bold shadow-md cursor-pointer"
           >
-            Войти / Регистрация
+            {t.profile.login_reg_btn}
           </button>
         </div>
       </div>
@@ -119,7 +121,7 @@ export function ProfileModal() {
     if (e) e.preventDefault();
     const codeToUse = customCode || promoInput;
     if (!codeToUse.trim()) {
-      setPromoMessage({ type: "error", text: "Введите код промокода" });
+      setPromoMessage({ type: "error", text: t.profile.promo_required });
       return;
     }
 
@@ -159,7 +161,7 @@ export function ProfileModal() {
         <button
           type="button"
           onClick={closeProfileModal}
-          className="absolute right-4 top-4 p-2 rounded-full text-stone-400 hover:text-stone-700 hover:bg-sand-100 transition-all z-10"
+          className="absolute right-4 top-4 p-2 rounded-full text-stone-400 hover:text-stone-700 hover:bg-sand-100 transition-all z-10 cursor-pointer"
         >
           <X size={18} />
         </button>
@@ -190,7 +192,7 @@ export function ProfileModal() {
             </p>
             <div className="flex items-center gap-2 mt-1.5 flex-wrap">
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 text-[10px] font-bold border border-emerald-300">
-                💎 Премиум гость • Аялы Мекен
+                {t.profile.premium_badge}
               </span>
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[10px] font-extrabold border border-amber-300">
                 <Coins size={11} className="text-amber-600" />
@@ -211,8 +213,8 @@ export function ProfileModal() {
               <Calendar size={16} className="text-amber-300" />
             </div>
             <div>
-              <span className="font-bold text-xs text-emerald-950 block">Мои поездки</span>
-              <span className="text-[10px] text-stone-400">Брони и ключи</span>
+              <span className="font-bold text-xs text-emerald-950 block">{t.profile.trips_card}</span>
+              <span className="text-[10px] text-stone-400">{t.profile.trips_card_sub}</span>
             </div>
           </Link>
 
@@ -225,8 +227,8 @@ export function ProfileModal() {
               <MessageCircle size={16} />
             </div>
             <div>
-              <span className="font-bold text-xs text-emerald-950 block">Служба заботы</span>
-              <span className="text-[10px] text-stone-400">Чат и помощь 24/7</span>
+              <span className="font-bold text-xs text-emerald-950 block">{t.profile.support_card}</span>
+              <span className="text-[10px] text-stone-400">{t.profile.support_card_sub}</span>
             </div>
           </button>
         </div>
@@ -236,10 +238,10 @@ export function ProfileModal() {
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-xs font-bold text-emerald-950 uppercase tracking-wider flex items-center gap-1.5">
               <Ticket size={13} className="text-amber-500" />
-              Промокоды и бонусы
+              {t.profile.promocodes_title}
             </h3>
             <span className="text-[11px] font-bold text-emerald-800">
-              Баланс: {formatKZT(user.bonus_balance || 5000)}
+              {t.profile.balance_label} {formatKZT(user.bonus_balance || 5000)}
             </span>
           </div>
 
@@ -251,7 +253,7 @@ export function ProfileModal() {
                 type="text"
                 value={promoInput}
                 onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
-                placeholder="Введите ваш промокод"
+                placeholder={t.profile.promo_placeholder}
                 className="w-full h-10 rounded-xl border border-sand-300 bg-sand-50/50 pl-8 pr-3 text-xs font-bold uppercase tracking-wider text-emerald-950 placeholder:normal-case placeholder:font-normal placeholder:tracking-normal focus:bg-white focus:border-emerald-700 focus:outline-none transition-all"
               />
             </div>
@@ -264,7 +266,7 @@ export function ProfileModal() {
                 <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-300" />
               ) : (
                 <>
-                  <span>Применить</span>
+                  <span>{t.profile.apply_btn}</span>
                   <ArrowRight size={13} className="text-amber-300" />
                 </>
               )}
@@ -294,11 +296,11 @@ export function ProfileModal() {
         <form onSubmit={handleSave} className="space-y-4 pt-4">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold text-emerald-950 uppercase tracking-wider">
-              Личные данные гостя
+              {t.profile.personal_data}
             </h3>
             {saveSuccess && (
               <span className="text-[11px] font-bold text-emerald-700 flex items-center gap-1 animate-in fade-in">
-                <Check size={13} /> Данные сохранены
+                <Check size={13} /> {t.profile.data_saved}
               </span>
             )}
           </div>
@@ -306,7 +308,7 @@ export function ProfileModal() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="text-[11px] font-bold text-stone-600 mb-1 block">
-                Имя и фамилия *
+                {t.profile.full_name}
               </label>
               <div className="relative">
                 <input
@@ -321,7 +323,7 @@ export function ProfileModal() {
 
             <div>
               <label className="text-[11px] font-bold text-stone-600 mb-1 block">
-                Телефон WhatsApp *
+                {t.profile.whatsapp_phone}
               </label>
               <div className="relative">
                 <input
@@ -338,7 +340,7 @@ export function ProfileModal() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="text-[11px] font-bold text-stone-600 mb-1 block">
-                Email для квитанций
+                {t.profile.receipt_email}
               </label>
               <input
                 type="email"
@@ -351,16 +353,16 @@ export function ProfileModal() {
 
             <div>
               <label className="text-[11px] font-bold text-stone-600 mb-1 block">
-                Основной город
+                {t.profile.main_city}
               </label>
               <select
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 className="w-full h-10 rounded-xl border border-sand-300 bg-sand-50/50 px-3 text-xs font-semibold text-stone-900 focus:bg-white focus:border-emerald-700 focus:outline-none transition-all"
               >
-                <option value="Астана">Астана</option>
-                <option value="Алматы">Алматы</option>
-                <option value="Шымкент">Шымкент</option>
+                <option value="Астана">{t.search.astana}</option>
+                <option value="Алматы">{t.search.almaty}</option>
+                <option value="Шымкент">{t.search.shymkent}</option>
                 <option value="Караганда">Караганда</option>
                 <option value="Актау">Актау</option>
                 <option value="Атырау">Атырау</option>
@@ -378,10 +380,10 @@ export function ProfileModal() {
             ) : saveSuccess ? (
               <>
                 <Check className="w-4 h-4 text-emerald-400" />
-                <span>Сохранено!</span>
+                <span>{t.profile.saved_success}</span>
               </>
             ) : (
-              "Сохранить изменения"
+              t.profile.save_changes
             )}
           </button>
         </form>
@@ -391,25 +393,25 @@ export function ProfileModal() {
           <div className="pt-4 mt-4 border-t border-red-200 p-4 rounded-2xl bg-red-50/90 border space-y-3 animate-in fade-in">
             <div className="flex items-center gap-2 text-red-900 font-bold text-xs">
               <span>⚠️</span>
-              <span>Вы уверены, что хотите удалить аккаунт?</span>
+              <span>{t.profile.delete_confirm_title}</span>
             </div>
             <p className="text-[11px] text-red-700 leading-snug">
-              Все сохраненные данные профиля и активная сессия будут удалены с этого устройства.
+              {t.profile.delete_confirm_sub}
             </p>
             <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => setIsDeleteConfirmOpen(false)}
-                className="flex-1 py-2 rounded-xl bg-white border border-stone-300 text-xs font-bold text-stone-700 hover:bg-stone-50 transition-all"
+                className="flex-1 py-2 rounded-xl bg-white border border-stone-300 text-xs font-bold text-stone-700 hover:bg-stone-50 transition-all cursor-pointer"
               >
-                Отмена
+                {t.profile.cancel}
               </button>
               <button
                 type="button"
                 onClick={handleDeleteAccount}
-                className="flex-1 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-sm transition-all"
+                className="flex-1 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-sm transition-all cursor-pointer"
               >
-                Да, удалить аккаунт
+                {t.profile.delete_btn}
               </button>
             </div>
           </div>
@@ -422,7 +424,7 @@ export function ProfileModal() {
               className="px-3 py-1.5 rounded-xl border border-sand-300 text-stone-600 hover:bg-sand-100 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
             >
               <LogOut size={13} />
-              <span>Выйти</span>
+              <span>{t.profile.logout}</span>
             </button>
 
             <button
@@ -430,7 +432,7 @@ export function ProfileModal() {
               onClick={() => setIsDeleteConfirmOpen(true)}
               className="px-3 py-1.5 rounded-xl text-red-600 hover:bg-red-50 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
             >
-              <span>Удалить аккаунт</span>
+              <span>{t.profile.delete_account}</span>
             </button>
           </div>
         )}
