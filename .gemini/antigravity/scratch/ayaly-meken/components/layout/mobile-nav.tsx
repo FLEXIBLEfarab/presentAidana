@@ -39,7 +39,7 @@ export function MobileNav() {
       onClick: undefined,
     },
     {
-      label: "Поддержка",
+      label: t.nav.support,
       href: "#support" as string,
       icon: MessageCircle,
       active: isSupportOpen,

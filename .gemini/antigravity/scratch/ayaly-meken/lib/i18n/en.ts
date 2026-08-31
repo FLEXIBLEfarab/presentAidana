@@ -239,6 +239,18 @@ const en = {
   "terms_modal": {
     "title": "Terms of Service & House Rules",
     "close": "Got it"
+  },
+  "footer": {
+    "prop_1_title": "Contactless check-in",
+    "prop_1_sub": "Personal door PIN code is delivered instantly after booking.",
+    "prop_2_title": "Hotel-grade standard",
+    "prop_2_sub": "Professional cleaning and fresh hotel linens before every stay.",
+    "prop_3_title": "High-speed Wi-Fi",
+    "prop_3_sub": "Verified high-speed internet connection in every residence.",
+    "prop_4_title": "24/7 Support",
+    "prop_4_sub": "Fast assistance via WhatsApp and concierge service.",
+    "powered_by": "• Powered by Altyn Qonaq PMS",
+    "rights": "All rights reserved."
   }
 };
 
