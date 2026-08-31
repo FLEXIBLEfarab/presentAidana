@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { MOCK_APARTMENTS, MOCK_BOOKINGS } from "@/lib/mock-data";
 import { Booking, ServiceRequest, ServiceRequestType, Result } from "@/types/database.types";
+import { sendBookingConfirmationEmail } from "@/lib/email";
 
 const ORG_ID = "00000000-0000-0000-0000-000000000001";
 
@@ -121,6 +122,20 @@ export async function createBooking(
     if (!error && data) {
       const enriched = enrichBooking(data);
       MOCK_BOOKINGS.unshift(enriched);
+      // Send confirmation email asynchronously
+      if (enriched.guest_email) {
+        sendBookingConfirmationEmail({
+          guestEmail: enriched.guest_email,
+          guestName: enriched.guest_name,
+          apartmentName: enriched.apartment?.name || "Апартаменты",
+          apartmentAddress: enriched.apartment?.address || "Казахстан",
+          checkInDate: enriched.check_in_date,
+          checkOutDate: enriched.check_out_date,
+          totalPrice: enriched.total_price,
+          doorPinCode: enriched.door_pin_code,
+          bookingId: enriched.id,
+        }).catch((e) => console.error("Error sending booking email:", e));
+      }
       return { success: true, data: enriched };
     }
 
