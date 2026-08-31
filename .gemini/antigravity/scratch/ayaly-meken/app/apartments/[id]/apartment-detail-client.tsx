@@ -4,7 +4,8 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  Star, MapPin, Sparkles, ShieldCheck, KeyRound, Wifi, CheckCircle2, Share2, Heart,
+  Star, MapPin, Sparkles, ShieldCheck, KeyRound,
+  Key, Wifi, CheckCircle2, Share2, Heart,
   ChevronLeft, Grid, Users, BedDouble, Bath, Maximize2, ChevronDown, ChevronUp,
   Zap, Clock, Building2, Mountain, Flag, Wind, Tv, WashingMachine, UtensilsCrossed,
   Car, Coffee, Flame, HelpCircle, Camera, ImageOff
@@ -116,10 +117,17 @@ export function ApartmentDetailClient({ apartment, reviews }: ApartmentDetailCli
             <Zap className="h-3 w-3 text-amber-500 fill-amber-500" />
             Мгновенное бронирование
           </span>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-[11px] font-bold text-emerald-800">
-            <KeyRound className="h-3 w-3" />
-            Бесконтактный заезд по ПИН-коду
-          </span>
+          {apartment.ttlock_lock_id && apartment.ttlock_lock_id !== "none" && apartment.ttlock_lock_id !== "lock_default" && apartment.ttlock_lock_id !== "" ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-[11px] font-bold text-emerald-800">
+              <KeyRound className="h-3 w-3" />
+              Бесконтактный заезд по ПИН-коду
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-sand-50 border border-sand-300 px-3 py-1 text-[11px] font-bold text-stone-700">
+              <Key className="h-3 w-3 text-amber-600" />
+              Заселение с передачей ключей
+            </span>
+          )}
           <span className="inline-flex items-center gap-1.5 rounded-full bg-sand-100 border border-sand-300 px-3 py-1 text-[11px] font-bold text-stone-700">
             <ShieldCheck className="h-3 w-3 text-emerald-700" />
             Платформа Altyn Qonaq & Ayaly Meken

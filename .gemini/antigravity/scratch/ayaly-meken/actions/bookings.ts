@@ -14,7 +14,7 @@ function enrichBooking(b: any): Booking {
     cover_image:
       rawApt.cover_image ||
       matchApt?.cover_image ||
-      "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1200&auto=format&fit=crop",
+      null,
     wifi_name: rawApt.wifi_name || matchApt?.wifi_name || "AyalyMeken_Guest",
     wifi_password: rawApt.wifi_password || matchApt?.wifi_password || "AltynGuest2026",
     intercom_code: rawApt.intercom_code || matchApt?.intercom_code || "101K",
@@ -22,10 +22,17 @@ function enrichBooking(b: any): Booking {
     check_out_time: rawApt.check_out_time || "12:00",
   };
 
+  const hasSmartLock = Boolean(
+    rawApt?.ttlock_lock_id &&
+    rawApt.ttlock_lock_id !== "none" &&
+    rawApt.ttlock_lock_id !== "lock_default" &&
+    rawApt.ttlock_lock_id !== ""
+  );
+
   return {
     ...b,
-    door_pin_code: b.door_pin_code || b.ttlock_passcode || "582910",
-    ttlock_passcode: b.ttlock_passcode || b.door_pin_code || "582910",
+    door_pin_code: hasSmartLock ? (b.door_pin_code || b.ttlock_passcode || null) : null,
+    ttlock_passcode: hasSmartLock ? (b.ttlock_passcode || b.door_pin_code || null) : null,
     apartment,
   };
 }
@@ -51,7 +58,14 @@ export interface CreateBookingInput {
 export async function createBooking(
   input: CreateBookingInput
 ): Promise<Result<Booking>> {
-  const pinCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const matchApt = MOCK_APARTMENTS.find((a) => a.id === input.apartmentId);
+  const hasSmartLock = Boolean(
+    matchApt?.ttlock_lock_id &&
+    matchApt.ttlock_lock_id !== "none" &&
+    matchApt.ttlock_lock_id !== "lock_default" &&
+    matchApt.ttlock_lock_id !== ""
+  );
+  const pinCode = hasSmartLock ? Math.floor(100000 + Math.random() * 900000).toString() : null;
   const guestName = `${input.guestFirstName} ${input.guestLastName}`.trim();
   const bookingId = crypto.randomUUID();
 
@@ -126,7 +140,7 @@ export async function createBooking(
 
 function makeSimulatedBooking(
   payload: any,
-  pinCode: string,
+  pinCode: string | null,
   apartmentId: string
 ): Booking {
   const matchApt = MOCK_APARTMENTS.find((a) => a.id === apartmentId) || MOCK_APARTMENTS[0];

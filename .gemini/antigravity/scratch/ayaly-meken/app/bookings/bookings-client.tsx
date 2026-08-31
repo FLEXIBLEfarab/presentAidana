@@ -8,7 +8,8 @@ import { getBookings } from "@/actions/bookings";
 import { Booking } from "@/types/database.types";
 import { formatKZT, formatDateRange } from "@/lib/utils";
 import {
-  Luggage, Calendar, KeyRound, ChevronRight, Sparkles, MapPin, Clock, MessageCircle, User, LogIn, Loader2, Star, ThumbsUp
+  Luggage, Calendar, KeyRound,
+  Key, ChevronRight, Sparkles, MapPin, Clock, MessageCircle, User, LogIn, Loader2, Star, ThumbsUp
 } from "lucide-react";
 import { ReviewModal } from "@/components/reviews/review-modal";
 
@@ -185,16 +186,25 @@ export function BookingsClient({ initialBookings }: { initialBookings: Booking[]
 
                     {/* PIN & Actions Row */}
                     <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-sand-200 pt-4">
+                                            {/* Access Display: Smart Lock PIN OR Physical Keys */}
                       <div className="flex items-center gap-2">
                         <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-100 text-emerald-900">
-                          <KeyRound className="h-4 w-4" />
+                          {apt?.ttlock_lock_id && apt.ttlock_lock_id !== "none" && apt.ttlock_lock_id !== "lock_default" && apt.ttlock_lock_id !== "" ? (
+                            <KeyRound className="h-4 w-4" />
+                          ) : (
+                            <Key className="h-4 w-4" />
+                          )}
                         </div>
                         <div>
                           <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400">
-                            Цифровой ПИН
+                            {apt?.ttlock_lock_id && apt.ttlock_lock_id !== "none" && apt.ttlock_lock_id !== "lock_default" && apt.ttlock_lock_id !== ""
+                              ? "Цифровой ПИН"
+                              : "Способ доступа"}
                           </span>
                           <div className={`font-mono text-sm font-black tracking-wider ${isCheckedOut ? "text-stone-400" : "text-emerald-950"}`}>
-                            {pinDisplay}
+                            {apt?.ttlock_lock_id && apt.ttlock_lock_id !== "none" && apt.ttlock_lock_id !== "lock_default" && apt.ttlock_lock_id !== ""
+                              ? pinDisplay
+                              : "🗝️ Ручные ключи"}
                           </div>
                         </div>
                       </div>

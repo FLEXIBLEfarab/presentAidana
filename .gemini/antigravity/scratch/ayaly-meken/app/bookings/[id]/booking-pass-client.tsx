@@ -4,7 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  KeyRound, Wifi, Copy, Check, MapPin, Clock, MessageCircle, ExternalLink,
+  KeyRound,
+  Key, Wifi, Copy, Check, MapPin, Clock, MessageCircle, ExternalLink,
   ChevronLeft, Sparkles, ShieldCheck, LockOpen, Lock, AlertCircle, Star, ThumbsUp
 } from "lucide-react";
 import { Booking } from "@/types/database.types";
@@ -21,6 +22,12 @@ export function BookingPassClient({ booking }: BookingPassClientProps) {
 
   const apt = booking.apartment;
   const isCheckedOut = booking.status === "checked_out";
+  const hasSmartLock = Boolean(
+    apt?.ttlock_lock_id &&
+    apt.ttlock_lock_id !== "none" &&
+    apt.ttlock_lock_id !== "lock_default" &&
+    apt.ttlock_lock_id !== ""
+  );
   const isCheckedIn = booking.status === "checked_in";
 
   // PIN is active if checked_in OR within window and confirmed (and not checked_out)

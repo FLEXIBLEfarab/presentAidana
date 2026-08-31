@@ -105,7 +105,11 @@ export function BookingWidget({ apartment }: BookingWidgetProps) {
       {/* Digital Access Note */}
       <div className="mt-5 flex items-center gap-2.5 rounded-2xl bg-sand-100/80 p-3 text-[11px] text-stone-600">
         <ShieldCheck className="h-4 w-4 text-emerald-700 shrink-0" />
-        <span>Цифровой ПИН-код двери придёт мгновенно после подтверждения. Бесплатная отмена в течение 24 ч.</span>
+        <span>
+          {apartment.ttlock_lock_id && apartment.ttlock_lock_id !== "none" && apartment.ttlock_lock_id !== "lock_default" && apartment.ttlock_lock_id !== ""
+            ? "Цифровой ПИН-код двери придёт мгновенно после подтверждения. Бесплатная отмена в течение 24 ч."
+            : "Инструкции по получению ключей от хозяина придут сразу после бронирования. Бесплатная отмена в течение 24 ч."}
+        </span>
       </div>
     </div>
   );
