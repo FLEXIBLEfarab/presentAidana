@@ -6,12 +6,14 @@ import { format, addDays } from "date-fns";
 import { Sparkles, Calendar, Users, ShieldCheck, Zap, Info, TrendingDown } from "lucide-react";
 import { Apartment } from "@/types/database.types";
 import { calculateBookingPrice, formatKZT } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/context";
 
 interface BookingWidgetProps {
   apartment: Apartment;
 }
 
 export function BookingWidget({ apartment }: BookingWidgetProps) {
+  const { t } = useI18n();
   const router = useRouter();
 
   const today = new Date();
@@ -39,11 +41,11 @@ export function BookingWidget({ apartment }: BookingWidgetProps) {
       <div className="flex items-baseline justify-between border-b border-sand-200 pb-4">
         <div>
           <span className="font-serif text-2xl font-extrabold text-emerald-950">{formatKZT(apartment.base_night_price)}</span>
-          <span className="text-sm text-stone-500 font-medium"> / ночь</span>
+          <span className="text-sm text-stone-500 font-medium"> {t.apartment.per_night}</span>
         </div>
         <div className="flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800">
           <Sparkles className="h-3 w-3 text-amber-500" />
-          <span>Мгновенно</span>
+          <span>{t.apartment.instant}</span>
         </div>
       </div>
 
@@ -85,9 +87,9 @@ export function BookingWidget({ apartment }: BookingWidgetProps) {
         className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-900 py-4 text-sm font-bold text-cream-50 shadow-md transition-all hover:bg-emerald-800 hover:shadow-lg active:scale-98 cursor-pointer"
       >
         <Zap className="h-4 w-4 text-amber-300 fill-amber-300" />
-        <span>Забронировать · {formatKZT(priceInfo.total)}</span>
+        <span>{t.apartment.book_now} · {formatKZT(priceInfo.total)}</span>
       </button>
-      <p className="mt-2.5 text-center text-[11px] text-stone-500">Прямое бронирование по фиксированной цене</p>
+      <p className="mt-2.5 text-center text-[11px] text-stone-500">{t.booking.direct_guarantee}</p>
 
       {/* Price Breakdown */}
       <div className="mt-6 space-y-2.5 border-t border-sand-200 pt-5 text-xs text-stone-600">
@@ -97,7 +99,7 @@ export function BookingWidget({ apartment }: BookingWidgetProps) {
         </div>
 
         <div className="flex items-center justify-between border-t border-sand-200 pt-3 text-sm font-bold text-emerald-950">
-          <span>Итого (KZT)</span>
+          <span>{t.booking.total}</span>
           <span className="text-base font-extrabold">{formatKZT(priceInfo.total)}</span>
         </div>
       </div>

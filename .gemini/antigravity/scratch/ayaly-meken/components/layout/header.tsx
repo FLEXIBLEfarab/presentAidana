@@ -28,7 +28,7 @@ export function Header() {
               Ayaly Meken
             </span>
             <span className="hidden sm:block text-[10px] font-medium tracking-widest text-emerald-700/80 uppercase">
-              Аялы Мекен • KZ RU
+              {t.nav.brand_sub}
             </span>
           </div>
         </Link>
@@ -63,7 +63,7 @@ export function Header() {
             href="/bookings"
             className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-sand-300 bg-white px-3.5 py-1.5 text-xs font-bold text-stone-700 hover:border-emerald-800 transition-all shadow-sm"
           >
-            <span>Мои поездки</span>
+            <span>{t.nav.trips}</span>
           </Link>
 
           {/* User Account Button */}
@@ -92,7 +92,7 @@ export function Header() {
               className="flex items-center gap-1.5 rounded-full bg-emerald-900 hover:bg-emerald-950 text-cream-50 px-3.5 py-1.5 text-xs font-bold shadow-sm transition-all active:scale-95"
             >
               <User className="h-3.5 w-3.5 text-amber-300" />
-              <span>Войти</span>
+              <span>{t.nav.login}</span>
             </button>
           )}
         </div>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useGuestAuth } from "@/lib/auth-context";
+import { useI18n } from "@/lib/i18n/context";
 import { getBookings } from "@/actions/bookings";
 import { Booking } from "@/types/database.types";
 import { formatKZT, formatDateRange } from "@/lib/utils";
@@ -23,6 +24,7 @@ const statusLabels: Record<string, string> = {
 };
 
 export function BookingsClient({ initialBookings }: { initialBookings: Booking[] }) {
+  const { t } = useI18n();
   const { user, isLoading: isAuthLoading, openAuthModal } = useGuestAuth();
   const [bookings, setBookings] = useState<Booking[]>(initialBookings);
   const [isLoading, setIsLoading] = useState(false);
@@ -271,7 +273,7 @@ export function BookingsClient({ initialBookings }: { initialBookings: Booking[]
               className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-emerald-900 px-6 py-3 text-xs font-bold text-cream-50 shadow-md hover:bg-emerald-800"
             >
               <Sparkles className="h-4 w-4 text-amber-300" />
-              <span>Найти апартаменты</span>
+              <span>{t.trips.find_apartment}</span>
             </Link>
           </div>
         )}

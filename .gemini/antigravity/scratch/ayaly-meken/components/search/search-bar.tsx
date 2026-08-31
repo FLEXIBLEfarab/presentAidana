@@ -74,10 +74,10 @@ export function SearchBar({ compact = false }: SearchBarProps) {
             onChange={(e) => setCity(e.target.value)}
             className="w-full bg-transparent text-xs font-bold text-emerald-950 outline-none cursor-pointer"
           >
-            <option value="All">Все города</option>
-            <option value="Almaty">Алматы</option>
-            <option value="Astana">Астана</option>
-            <option value="Shymkent">Шымкент</option>
+            <option value="All">{t.search.all_cities}</option>
+            <option value="Almaty">{t.search.almaty}</option>
+            <option value="Astana">{t.search.astana}</option>
+            <option value="Shymkent">{t.search.shymkent}</option>
           </select>
         </div>
 
@@ -137,7 +137,7 @@ export function SearchBar({ compact = false }: SearchBarProps) {
           className="flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-900 to-emerald-950 px-7 py-3 text-xs font-bold text-cream-50 shadow-md shadow-emerald-950/20 transition-all hover:bg-emerald-800 hover:scale-[1.02] active:scale-95 cursor-pointer shrink-0 border border-emerald-700/30"
         >
           <Search className="h-3.5 w-3.5 text-amber-300" />
-          <span>Найти</span>
+          <span>{t.home.search_btn}</span>
         </button>
       </div>
 

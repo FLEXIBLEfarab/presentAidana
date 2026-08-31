@@ -16,6 +16,7 @@ import { GalleryModal } from "@/components/apartments/gallery-modal";
 import { ReviewModal } from "@/components/reviews/review-modal";
 import { ReportApartmentModal } from "@/components/apartments/report-apartment-modal";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/context";
 
 const AMENITY_LABELS: Record<string, { label: string; icon?: any }> = {
   wifi: { label: "Высокоскоростной Wi-Fi", icon: Wifi },
@@ -48,6 +49,7 @@ interface ApartmentDetailClientProps {
 }
 
 export function ApartmentDetailClient({ apartment, reviews }: ApartmentDetailClientProps) {
+  const { t } = useI18n();
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [isRulesOpen, setIsRulesOpen] = useState(false);
@@ -68,7 +70,7 @@ export function ApartmentDetailClient({ apartment, reviews }: ApartmentDetailCli
       <div className="flex items-center justify-between pb-4">
         <Link href="/" className="inline-flex items-center gap-1.5 text-xs font-bold text-stone-600 hover:text-emerald-950">
           <ChevronLeft className="h-4 w-4" />
-          <span>Назад к поиску</span>
+          <span>{t.nav.back_to_search}</span>
         </Link>
         <div className="flex items-center gap-3">
           <button
@@ -76,14 +78,14 @@ export function ApartmentDetailClient({ apartment, reviews }: ApartmentDetailCli
             className="flex items-center gap-1.5 rounded-full border border-sand-300 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700 hover:bg-sand-100 cursor-pointer"
           >
             <Share2 className="h-3.5 w-3.5" />
-            <span>Поделиться</span>
+            <span>{t.nav.share}</span>
           </button>
           <button
             onClick={() => setIsSaved(!isSaved)}
             className="flex items-center gap-1.5 rounded-full border border-sand-300 bg-white px-3 py-1.5 text-xs font-semibold text-stone-700 hover:bg-sand-100 cursor-pointer"
           >
             <Heart className={cn("h-3.5 w-3.5", isSaved ? "fill-rose-500 text-rose-500" : "")} />
-            <span>{isSaved ? "Сохранено" : "Сохранить"}</span>
+            <span>{isSaved ? t.nav.saved_badge : t.nav.save}</span>
           </button>
         </div>
       </div>
@@ -120,12 +122,12 @@ export function ApartmentDetailClient({ apartment, reviews }: ApartmentDetailCli
           {apartment.ttlock_lock_id && apartment.ttlock_lock_id !== "none" && apartment.ttlock_lock_id !== "lock_default" && apartment.ttlock_lock_id !== "" ? (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-[11px] font-bold text-emerald-800">
               <KeyRound className="h-3 w-3" />
-              Бесконтактный заезд по ПИН-коду
+              {t.apartment.self_checkin}
             </span>
           ) : (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-sand-50 border border-sand-300 px-3 py-1 text-[11px] font-bold text-stone-700">
               <Key className="h-3 w-3 text-amber-600" />
-              Заселение с передачей ключей
+              {t.apartment.manual_keys}
             </span>
           )}
           <span className="inline-flex items-center gap-1.5 rounded-full bg-sand-100 border border-sand-300 px-3 py-1 text-[11px] font-bold text-stone-700">
@@ -327,7 +329,7 @@ export function ApartmentDetailClient({ apartment, reviews }: ApartmentDetailCli
               className="inline-flex items-center gap-1.5 text-xs font-semibold text-stone-400 hover:text-red-600 transition-colors cursor-pointer"
             >
               <Flag size={13} />
-              <span>Пожаловаться на объявление</span>
+              <span>{t.apartment.report}</span>
             </button>
           </div>
         </div>

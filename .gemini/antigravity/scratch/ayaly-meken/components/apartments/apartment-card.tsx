@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Star, Heart, MapPin, ChevronLeft, ChevronRight, Sparkles, Users, BedDouble, ArrowUpRight, Crown } from "lucide-react";
 import { Apartment } from "@/types/database.types";
 import { formatKZT, cn } from "@/lib/utils";
+import { useI18n } from "@/lib/i18n/context";
 
 interface ApartmentCardProps {
   apartment: Apartment;
@@ -13,6 +14,7 @@ interface ApartmentCardProps {
 }
 
 export function ApartmentCard({ apartment, isHighlighted }: ApartmentCardProps) {
+  const { t } = useI18n();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
 
@@ -80,12 +82,12 @@ export function ApartmentCard({ apartment, isHighlighted }: ApartmentCardProps) 
         {isTopPromoted ? (
           <div className="absolute left-3 top-3 z-10 flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-3 py-1 text-[10px] font-black text-slate-950 shadow-md backdrop-blur-md border border-amber-300">
             <Crown className="h-3.5 w-3.5 fill-slate-950 text-slate-950" />
-            <span>👑 ТОП ВЫБОР</span>
+            <span>{t.apartment.top_choice}</span>
           </div>
         ) : (
           <div className="absolute left-3 top-3 z-10 flex items-center gap-1.5 rounded-full bg-emerald-950/85 px-2.5 py-1 text-[10px] font-bold text-cream-50 shadow-md backdrop-blur-md border border-amber-400/30">
             <Sparkles className="h-3 w-3 text-amber-300 fill-amber-300" />
-            <span>Ayaly Selection</span>
+            <span>{t.apartment.ayaly_selection}</span>
           </div>
         )}
 
@@ -142,7 +144,7 @@ export function ApartmentCard({ apartment, isHighlighted }: ApartmentCardProps) 
               ) : (
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 text-amber-900 text-[10px] font-bold border border-amber-200">
                   <Sparkles className="h-3 w-3 text-amber-500 fill-amber-500" />
-                  Новинка
+                  {t.apartment.new_badge}
                 </span>
               )}
             </div>
@@ -157,12 +159,12 @@ export function ApartmentCard({ apartment, isHighlighted }: ApartmentCardProps) 
           <div className="mt-2 flex items-center gap-2.5 text-xs text-stone-500 font-medium">
             <span className="flex items-center gap-1">
               <Users className="h-3.5 w-3.5 text-stone-400" />
-              до {apartment.max_guests || 2} гостей
+              {t.apartment.up_to_guests} {apartment.max_guests || 2} {t.apartment.guests_label}
             </span>
             <span className="text-sand-300">•</span>
             <span className="flex items-center gap-1">
               <BedDouble className="h-3.5 w-3.5 text-stone-400" />
-              {apartment.rooms_count || apartment.bedrooms || 1} комн. · {apartment.area_sqm || 45} м²
+              {apartment.rooms_count || apartment.bedrooms || 1} {t.apartment.rooms} · {apartment.area_sqm || 45} {t.apartment.sqm}
             </span>
           </div>
         </div>
@@ -173,11 +175,11 @@ export function ApartmentCard({ apartment, isHighlighted }: ApartmentCardProps) 
             <span className="text-base font-extrabold text-emerald-950 font-serif">
               {formatKZT(apartment.base_night_price)}
             </span>
-            <span className="text-xs text-stone-500 font-normal"> / ночь</span>
+            <span className="text-xs text-stone-500 font-normal"> {t.apartment.per_night}</span>
           </div>
 
           <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-900 group-hover:text-emerald-700 transition-colors">
-            <span>Смотреть</span>
+            <span>{t.apartment.view_btn}</span>
             <ArrowUpRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
           </span>
         </div>

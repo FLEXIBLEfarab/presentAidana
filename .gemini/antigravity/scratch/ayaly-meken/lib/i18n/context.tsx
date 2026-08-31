@@ -1,13 +1,14 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback } from "react";
-import kz from "./kz";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import ru from "./ru";
+import kz from "./kz";
+import en from "./en";
 
-export type Lang = "ru" | "kz";
+export type Lang = "ru" | "kz" | "en";
 export type Translations = typeof ru;
 
-const dictionaries = { ru, kz };
+const dictionaries: Record<Lang, Translations> = { ru, kz, en };
 
 interface I18nContextValue {
   lang: Lang;
@@ -24,12 +25,26 @@ const I18nContext = createContext<I18nContextValue>({
 export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLangState] = useState<Lang>("ru");
 
-  const setLang = useCallback((l: Lang) => {
-    setLangState(l);
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("ayaly_lang") as Lang;
+      if (saved && (saved === "ru" || saved === "kz" || saved === "en")) {
+        setLangState(saved);
+      }
+    } catch {}
   }, []);
 
+  const setLang = useCallback((l: Lang) => {
+    setLangState(l);
+    try {
+      localStorage.setItem("ayaly_lang", l);
+    } catch {}
+  }, []);
+
+  const currentDict = dictionaries[lang] || ru;
+
   return (
-    <I18nContext.Provider value={{ lang, t: dictionaries[lang], setLang }}>
+    <I18nContext.Provider value={{ lang, t: currentDict, setLang }}>
       {children}
     </I18nContext.Provider>
   );
