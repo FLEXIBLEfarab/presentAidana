@@ -22,6 +22,7 @@ export function BookingPassClient({ booking }: BookingPassClientProps) {
 
   const apt = booking.apartment;
   const isCheckedOut = booking.status === "checked_out";
+  const isCancelled = booking.status === "cancelled";
   const hasSmartLock = Boolean(
     apt?.ttlock_lock_id &&
     apt.ttlock_lock_id !== "none" &&
@@ -85,7 +86,9 @@ export function BookingPassClient({ booking }: BookingPassClientProps) {
             <span className="text-[10px] uppercase font-bold text-emerald-300">Бронь</span>
             <div className="font-mono text-sm font-black text-cream-50">#{booking.id.slice(-8).toUpperCase()}</div>
             <div className="text-[10px] mt-0.5 font-bold text-emerald-300">
-              {isCheckedOut
+              {isCancelled
+                ? "❌ Бронь отменена"
+                : isCheckedOut
                 ? "🏁 Проживание завершено"
                 : isCheckedIn
                 ? "🔑 Вы проживаете"
@@ -112,6 +115,23 @@ export function BookingPassClient({ booking }: BookingPassClientProps) {
           ))}
         </div>
       </div>
+
+            {/* Cancelled Alert Banner */}
+      {isCancelled && (
+        <div className="mt-6 rounded-3xl bg-rose-50 border-2 border-rose-300 p-6 flex items-start gap-4 shadow-sm">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-600 text-white shadow-md shrink-0">
+            <AlertCircle className="h-6 w-6" />
+          </div>
+          <div>
+            <h3 className="font-serif text-base font-bold text-rose-950">
+              Бронирование отменено
+            </h3>
+            <p className="text-xs text-rose-800 mt-1 leading-relaxed">
+              Это бронирование было отменено. Доступ к объекту закрыт, а цифровой ПИН-код умного замка деактивирован.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Review CTA Banner */}
       <div className="mt-6 rounded-3xl bg-gradient-to-r from-amber-500/10 via-emerald-500/10 to-amber-500/10 border border-amber-300/60 p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
