@@ -88,6 +88,9 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: "Ayaly Meken",
   },
+  verification: {
+    google: "88yBLsVNtFHmNkLY2_CRdrCDryTGovJ37aHte20_oEM",
+  },
   icons: {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },
@@ -127,6 +130,16 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ru" className={`${jakartaSans.variable} ${playfair.variable}`}>
+      <head>
+        <meta
+          name="google-site-verification"
+          content="88yBLsVNtFHmNkLY2_CRdrCDryTGovJ37aHte20_oEM"
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body className="flex min-h-screen flex-col bg-cream-50 font-sans antialiased text-stone-800">
         <AuthProvider>
           <I18nProvider>
