@@ -25,9 +25,63 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Ayaly Meken — Апартаменты в Казахстане",
-  description: "Умные апартаменты с бесконтактным заездом в Алматы, Астане и Шымкенте. Мгновенное бронирование, цифровой ПИН-код, гостиничный уровень сервиса.",
-  keywords: ["аренда апартаментов Алматы", "посуточно Астана", "TTLock бесконтактный заезд", "Аялы Мекен"],
+  metadataBase: new URL("https://ayaly-meken.kz"),
+  title: {
+    default: "Ayaly Meken — Аренда посуточных апартаментов в Казахстане | Бесконтактный заезд",
+    template: "%s | Ayaly Meken",
+  },
+  description: "Ayaly Meken (Аялы Мекен) — премиальные посуточные апартаменты в Алматы и Астане. Мгновенное бронирование, бесконтактный доступ по PIN-коду (TTLock), гостиничный сервис и идеальная чистота.",
+  keywords: [
+    "Ayaly Meken",
+    "Аялы Мекен",
+    "ayaly-meken.kz",
+    "аренда квартир посуточно Алматы",
+    "посуточно Астана",
+    "апартаменты посуточно Казахстан",
+    "бесконтактное заселение Алматы",
+    "умные замки апартаменты",
+    "квартиры посуточно Highvill",
+    "квартиры посуточно",
+  ],
+  authors: [{ name: "Ayaly Meken", url: "https://ayaly-meken.kz" }],
+  creator: "Ayaly Meken",
+  publisher: "Ayaly Meken",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "ru_KZ",
+    url: "https://ayaly-meken.kz",
+    title: "Ayaly Meken — Умные апартаменты в Казахстане",
+    description: "Премиальные квартиры с бесконтактным заездом в Алматы и Астане. Мгновенное бронирование, электронные PIN-коды, гостиничный сервис.",
+    siteName: "Ayaly Meken",
+    images: [
+      {
+        url: "/icons/icon-512.png",
+        width: 512,
+        height: 512,
+        alt: "Ayaly Meken Logo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Ayaly Meken — Аренда апартаментов в Казахстане",
+    description: "Бесконтактный заезд по PIN-коду в Алматы и Астане — Ayaly Meken («Аялы Мекен»)",
+    images: ["/icons/icon-512.png"],
+  },
+  alternates: {
+    canonical: "https://ayaly-meken.kz",
+  },
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -46,6 +100,19 @@ export const metadata: Metadata = {
       { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
     ],
   },
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "LodgingBusiness",
+  "name": "Ayaly Meken",
+  "url": "https://ayaly-meken.kz",
+  "description": "Премиальные посуточные апартаменты с умными замками и бесконтактным заселением в Казахстане.",
+  "address": {
+    "@type": "PostalAddress",
+    "addressCountry": "KZ"
+  },
+  "priceRange": "15000 - 60000 KZT"
 };
 
 export const viewport: Viewport = {
