@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { QrCode, Smartphone, CheckCircle2, ShieldCheck, X, Loader2, ExternalLink } from "lucide-react";
@@ -111,8 +111,21 @@ export function KaspiQrModal({
           <div className="mt-1 text-2xl font-black text-emerald-950">
             {formatKZT(amount)}
           </div>
-          <div className="mt-1 text-[11px] font-medium text-emerald-700">
-            Номер получателя / Kaspi: <strong>{hostPhone}</strong>
+          <div className="mt-2 flex items-center justify-center gap-2 text-xs font-semibold text-emerald-800 bg-emerald-50 py-1.5 px-3 rounded-xl border border-emerald-200">
+            <span>Получатель: <strong>{hostName}</strong></span>
+          </div>
+          <div className="mt-2 flex items-center justify-center gap-2">
+            <span className="text-xs text-stone-600 font-medium">Kaspi номер: <strong className="text-stone-900">{hostPhone}</strong></span>
+            <button
+              type="button"
+              onClick={() => {
+                navigator.clipboard.writeText(hostPhone.replace(/[^\d+]/g, ""));
+                alert("Номер Kaspi скопирован!");
+              }}
+              className="px-2 py-0.5 rounded-lg bg-white border border-stone-300 text-[11px] font-bold text-stone-700 hover:bg-stone-50 active:scale-95"
+            >
+              Скопировать
+            </button>
           </div>
         </div>
 
