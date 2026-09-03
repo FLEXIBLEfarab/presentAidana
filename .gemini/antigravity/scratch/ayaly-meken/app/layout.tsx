@@ -6,8 +6,10 @@ import { MobileNav } from "@/components/layout/mobile-nav";
 import { Footer } from "@/components/layout/footer";
 import { I18nProvider } from "@/lib/i18n/context";
 import { AuthProvider } from "@/lib/auth-context";
-import { AuthModal } from "@/components/auth/auth-modal";
-import { ProfileModal } from "@/components/profile/profile-modal";
+// Lazy-load heavy modals — only rendered on user interaction, not on initial page load
+import dynamic from "next/dynamic";
+const AuthModal = dynamic(() => import("@/components/auth/auth-modal").then(m => ({ default: m.AuthModal })), { ssr: false });
+const ProfileModal = dynamic(() => import("@/components/profile/profile-modal").then(m => ({ default: m.ProfileModal })), { ssr: false });
 
 const jakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],

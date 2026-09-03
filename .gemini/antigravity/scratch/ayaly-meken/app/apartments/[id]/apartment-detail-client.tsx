@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import {
   Star, MapPin, Sparkles, ShieldCheck, KeyRound,
   Key, Wifi, CheckCircle2, Share2, Heart,
@@ -12,11 +13,13 @@ import {
 } from "lucide-react";
 import { Apartment, Review } from "@/types/database.types";
 import { BookingWidget } from "@/components/apartments/booking-widget";
-import { GalleryModal } from "@/components/apartments/gallery-modal";
-import { ReviewModal } from "@/components/reviews/review-modal";
-import { ReportApartmentModal } from "@/components/apartments/report-apartment-modal";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/lib/i18n/context";
+
+// Lazy-load heavy modals — only needed when user interacts
+const GalleryModal = dynamic(() => import("@/components/apartments/gallery-modal").then(m => ({ default: m.GalleryModal })), { ssr: false });
+const ReviewModal = dynamic(() => import("@/components/reviews/review-modal").then(m => ({ default: m.ReviewModal })), { ssr: false });
+const ReportApartmentModal = dynamic(() => import("@/components/apartments/report-apartment-modal").then(m => ({ default: m.ReportApartmentModal })), { ssr: false });
 
 const AMENITY_LABELS: Record<string, { label: string; icon?: any }> = {
   wifi: { label: "Высокоскоростной Wi-Fi", icon: Wifi },
